@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --accent: #B8F34B;
+      --header-blue: #3B6BFF;
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: white; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .container { width: 100%; max-width: 880px; }
+    .card { background: var(--card-bg); padding: 28px 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .logo { text-align: center; font-weight: 900; font-size: 28px; margin-bottom: 24px; color: var(--accent); text-transform: lowercase; }
+
+    /* 2-column grid */
+    .layout { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; }
+    .divider { background: #2a2a2a; margin: 0 28px; }
+    .left { }
+    .right { }
+
+    .panel-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #444; font-weight: 600; margin-bottom: 14px; }
+
+    /* Type selector */
+    .type-selector { display: flex; gap: 10px; margin-bottom: 18px; }
+    .type-btn { flex: 1; padding: 11px; border: 2px solid #333; border-radius: 12px; background: #2d2d2d; color: #666; cursor: pointer; font-weight: 700; transition: 0.25s; text-align: center; font-family: 'Inter', sans-serif; font-size: 13px; }
+    .type-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(184,243,75,0.08); }
+
+    /* Inputs */
+    .input-group { position: relative; margin-bottom: 13px; }
+    input { width: 100%; padding: 13px 44px 13px 14px; border-radius: 11px; border: 2px solid #2e2e2e; background: #252525; color: white; font-family: 'Inter', sans-serif; font-size: 13.5px; transition: border-color 0.2s; }
+    input:focus { outline: none; border-color: var(--accent); }
+    input:focus + .check-icon { color: var(--accent); }
+    .check-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #333; pointer-events: none; transition: color 0.2s; }
+    input:valid + .check-icon { color: var(--accent); }
+
+    .calc-preview { background: #1a1a1a; padding: 13px 15px; border-radius: 11px; margin-bottom: 16px; border-left: 3px solid var(--accent); display: none; }
+    .calc-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; }
+    .calc-val { font-weight: 700; color: var(--accent); }
+
+    /* Buttons */
+    .btn-main { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--accent); color: #111; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.25s; font-family: 'Inter', sans-serif; }
+    .btn-main:disabled { background: #2d2d2d; color: #555; cursor: not-allowed; }
+    .btn-main:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-ghost { width: 100%; padding: 12px; border: 1px solid #333; border-radius: 11px; background: transparent; color: #666; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-family: 'Inter', sans-serif; margin-top: 8px; }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Copy buttons */
+    .copy-actions { display: none; margin-top: 14px; }
+    .btn-copy { width: 100%; padding: 11px; border-radius: 10px; font-weight: 700; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+    .btn-copy-img { background: rgba(59,107,255,0.12); border: 1px solid rgba(59,107,255,0.35); color: #7AADFF; }
+    .btn-copy-img:hover { background: rgba(59,107,255,0.22); }
+    .btn-copy-txt { background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.3); color: #4ADE80; }
+    .btn-copy-txt:hover { background: rgba(37,211,102,0.16); }
+    .wa-box { background: #1a1a1a; padding: 12px; border-radius: 10px; border: 1px dashed #333; margin: 4px 0 8px; }
+    .wa-text { font-size: 11px; color: #999; white-space: pre-wrap; font-family: monospace; line-height: 1.55; }
+
+    /* Ticket */
+    #ticket-design { background: white; color: #111; border-radius: 14px; border: 3px solid var(--accent); overflow: hidden; transition: box-shadow 0.3s, transform 0.3s; }
+    .t-head { background: var(--header-blue); padding: 20px 22px; text-align: center; color: white; }
+    .t-brand { font-weight: 900; font-size: 24px; margin: 0; font-family: 'Inter', sans-serif; }
+    .t-badge { display: inline-block; padding: 4px 13px; background: #111; color: var(--accent); border-radius: 50px; font-size: 9px; margin-top: 6px; font-weight: 700; letter-spacing: 0.5px; }
+    .t-body { padding: 20px 22px; text-align: center; }
+    .t-lbl { font-size: 9.5px; color: #aaa; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; font-family: 'Inter', sans-serif; }
+    .t-name { font-size: 18px; font-weight: 800; margin-bottom: 13px; color: #111; min-height: 26px; transition: color 0.2s; font-family: 'Inter', sans-serif; }
+    .t-name.ph { color: #ccc; }
+    .t-amount { font-size: 42px; font-weight: 900; color: #000; margin: 4px 0; line-height: 1; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+    .t-amount.ph { color: #ddd; font-size: 34px; }
+    .t-validity { margin-top: 10px; font-size: 11.5px; font-weight: 700; background: #f5f5f5; padding: 7px 10px; border-radius: 7px; color: #c62828; font-family: 'Inter', sans-serif; }
+    .t-msg { font-size: 10px; color: #888; margin-top: 11px; font-style: italic; border-top: 1px solid #eee; padding-top: 10px; line-height: 1.5; min-height: 36px; font-family: 'Inter', sans-serif; }
+    .t-foot { background: var(--accent); padding: 7px 20px; text-align: center; font-size: 8.5px; color: #1a3a00; font-weight: 600; letter-spacing: 0.4px; font-family: 'Inter', sans-serif; }
+
+    /* Success state (left) */
+    #success-state { display: none; text-align: center; padding: 20px 0; }
+    .s-circle { width: 68px; height: 68px; border-radius: 50%; background: rgba(184,243,75,0.08); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; box-shadow: 0 0 30px rgba(184,243,75,0.15); }
+    .s-title { font-size: 22px; font-weight: 900; margin-bottom: 7px; }
+    .s-sub { font-size: 12.5px; color: #555; margin-bottom: 22px; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #111; padding: 11px 24px; border-radius: 50px; font-weight: 700; display: none; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.4); font-family: 'Inter', sans-serif; font-size: 13px; white-space: nowrap; }
+
+    .fa-spin { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    @keyframes ticketPop {
+      0%   { transform: scale(1); box-shadow: none; }
+      40%  { transform: scale(1.04); box-shadow: 0 0 40px rgba(184,243,75,0.35); }
+      100% { transform: scale(1); box-shadow: none; }
+    }
+    .popping { animation: ticketPop 0.55s ease; }
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div class="container">
+  <div class="card">
+    <div class="logo">kodland</div>
+
+    <div class="layout">
+
+      <!-- ── LEFT ── -->
+      <div class="left">
+
+        <div id="form-state">
+          <div class="panel-label">Tipo de Pacote</div>
+          <div class="type-selector">
+            <div id="type-padrao" class="type-btn active" onclick="setType('PADRÃO')">PADRÃO</div>
+            <div id="type-premium" class="type-btn"        onclick="setType('PREMIUM')">PREMIUM</div>
+          </div>
+
+          <div class="input-group">
+            <input id="n" placeholder="Nome do Aluno" required oninput="updateTicket()">
+            <i class="fas fa-check-circle check-icon"></i>
+          </div>
+
+          <div class="input-group">
+            <input id="v_venta" type="number" placeholder="Valor da Venda (R$)" required oninput="calcular()">
+            <i class="fas fa-wallet check-icon"></i>
+          </div>
+
+          <div id="preview-box" class="calc-preview">
+            <div class="calc-row"><span>Cashback Estimado:</span><span id="c_label" class="calc-val">R$ 0.00</span></div>
+            <div class="calc-row"><span>Compra Mínima p/ uso:</span><span id="a_label" class="calc-val">0 aulas</span></div>
+          </div>
+
+          <div class="input-group">
+            <input id="aulas_compra" type="number" placeholder="Quantas aulas comprou agora?" required oninput="calcular()">
+            <i class="fas fa-graduation-cap check-icon"></i>
+          </div>
+
+          <div class="input-group">
+            <input id="p" placeholder="Backoffice do Estudante (BO)" required oninput="updateTicket()">
+            <i class="fas fa-user-shield check-icon"></i>
+          </div>
+
+          <button class="btn-main" onclick="enviar()" id="btn-enviar" disabled>
+            <span id="btn-text">GERAR TICKET</span>
+          </button>
+        </div>
+
+        <div id="success-state">
+          <div class="s-circle">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B8F34B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="s-title">Ticket gerado!</div>
+          <div class="s-sub">Salvo na planilha com sucesso.</div>
+          <button class="btn-ghost" onclick="nuevoTicket()">
+            <i class="fas fa-plus"></i> GERAR NOVO TICKET
+          </button>
+        </div>
+
+      </div>
+
+      <!-- divider -->
+      <div class="divider"></div>
+
+      <!-- ── RIGHT ── -->
+      <div class="right" style="padding-left: 2px;">
+        <div class="panel-label" id="right-label">Preview em tempo real</div>
+
+        <div id="ticket-design">
+          <div class="t-head">
+            <p class="t-brand">Kodland</p>
+            <div class="t-badge">CASHBACK EXCLUSIVO</div>
+          </div>
+          <div class="t-body">
+            <div class="t-lbl">BENEFICIÁRIO</div>
+            <div id="res-n" class="t-name ph">NOME DO ALUNO</div>
+            <div class="t-lbl">VALOR DISPONÍVEL</div>
+            <div id="res-v" class="t-amount ph">R$ —</div>
+            <div class="t-validity">VÁLIDO ATÉ: <span id="res-d">—</span></div>
+            <p class="t-msg" id="res-msg">Preencha o formulário para gerar o ticket.</p>
+          </div>
+          <div class="t-foot">kodland.com.br • cashback verificado</div>
+        </div>
+
+        <div class="copy-actions" id="copy-actions">
+          <button class="btn-copy btn-copy-img" onclick="copiarImagen()">
+            <i class="fas fa-image"></i> COPIAR IMAGEM
+          </button>
+          <div class="wa-box">
+            <div id="text-whatsapp" class="wa-text"></div>
+          </div>
+          <button class="btn-copy btn-copy-txt" onclick="copiarTexto()">
+            <i class="fas fa-align-left"></i> COPIAR TEXTO WHATSAPP
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let cashback = 0;
+let aulasMin = 0;
+let tipoAtual = 'PADRÃO';
+let fechaValidezStr = "";
+
+function setType(t) {
+  tipoAtual = t;
+  document.getElementById('type-padrao').classList.toggle('active', t === 'PADRÃO');
+  document.getElementById('type-premium').classList.toggle('active', t === 'PREMIUM');
+  calcular();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 2500);
+}
+
+function updateTicket() {
+  const name = document.getElementById("n").value.trim().toUpperCase();
+  const resN = document.getElementById("res-n");
+  const resV = document.getElementById("res-v");
+
+  resN.innerText = name || "NOME DO ALUNO";
+  resN.classList.toggle("ph", !name);
+
+  resV.innerText = cashback > 0 ? "R$ " + cashback.toFixed(2) : "R$ —";
+  resV.classList.toggle("ph", cashback === 0);
+
+  document.getElementById("res-d").innerText = fechaValidezStr || "—";
+
+  const aulasIn = parseInt(document.getElementById("aulas_compra").value);
+  document.getElementById("res-msg").innerText = (cashback > 0 && aulasIn)
+    ? `Este valor só pode ser usado em sua próxima compra como um desconto adicional na aquisição de um pacote mínimo de ${aulasMin} aulas.`
+    : "Preencha o formulário para gerar o ticket.";
+}
+
+function calcular() {
+  const valInput = document.getElementById("v_venta").value;
+  const aulasIn  = parseInt(document.getElementById("aulas_compra").value);
+  const preview  = document.getElementById("preview-box");
+  const btn      = document.getElementById("btn-enviar");
+
+  if (!valInput || parseFloat(valInput) < 200) {
+    preview.style.display = "none";
+    btn.disabled = true;
+    cashback = 0;
+    updateTicket();
+    return;
+  }
+
+  const val = parseFloat(valInput);
+  preview.style.display = "block";
+
+  if      (val < 500)  cashback = val * 0.05;
+  else if (val < 1400) cashback = val * 0.075;
+  else if (val < 3000) cashback = val * 0.10;
+  else if (val < 4000) cashback = 350;
+  else                 cashback = 400;
+
+  if      (val < 500)  aulasMin = 10;
+  else if (val < 1400) aulasMin = tipoAtual === 'PREMIUM' ? 10 : 20;
+  else if (val < 2000) aulasMin = tipoAtual === 'PREMIUM' ? 20 : 40;
+  else if (val < 3000) aulasMin = 40;
+  else if (val < 4000) aulasMin = tipoAtual === 'PREMIUM' ? 40 : 60;
+  else                 aulasMin = tipoAtual === 'PREMIUM' ? 40 : 80;
+
+  document.getElementById("c_label").innerText = "R$ " + cashback.toFixed(2);
+  document.getElementById("a_label").innerText = aulasMin + " aulas";
+
+  if (aulasIn) {
+    const hoy = new Date();
+    const semanas = aulasIn === 4 ? 3 : Math.max(aulasIn - 8, 1) < 1 ? 4 : Math.max(aulasIn - 8, 4);
+    hoy.setDate(hoy.getDate() + semanas * 7);
+    fechaValidezStr = hoy.toLocaleDateString('pt-BR');
+    btn.disabled = false;
+  } else {
+    fechaValidezStr = "";
+    btn.disabled = true;
+  }
+
+  updateTicket();
+}
+
+function playSuccessSound() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    [659.25, 783.99, 987.77, 1318.51].forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.1;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.14, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+      osc.start(t); osc.stop(t + 0.55);
+    });
+  } catch(e) {}
+}
+
+function enviar() {
+  const btn     = document.getElementById("btn-enviar");
+  const btnText = document.getElementById("btn-text");
+
+  btn.disabled = true;
+  btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CRIANDO TICKET...';
+
+  const d = {
+    nombre:  document.getElementById("n").value.toUpperCase(),
+    valor:   cashback.toFixed(2),
+    validez: fechaValidezStr,
+    bo:      document.getElementById("p").value,
+    tipo:    tipoAtual
+  };
+
+  const msgFinal = `Este valor só pode ser usado em sua próxima compra como um desconto adicional na aquisição de um pacote mínimo de ${aulasMin} aulas.`;
+
+  fetch('/api/cashback', {
+    method:  'POST',
+    body:    JSON.stringify({
+      action: 'cashback', nombre: d.nombre,
+      venta_total: parseFloat(document.getElementById("v_venta").value),
+      valor: d.valor, validez: d.validez, perfil: d.bo, tipo: d.tipo, aulasMin
+    }),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(r => r.json())
+  .then(result => {
+    if (!result.success) throw new Error(result.message || 'Erro');
+
+    // finalize ticket
+    const resN = document.getElementById("res-n");
+    resN.innerText = d.nombre; resN.classList.remove("ph");
+    const resV = document.getElementById("res-v");
+    resV.innerText = "R$ " + d.valor; resV.classList.remove("ph");
+    document.getElementById("res-d").innerText = d.validez;
+    document.getElementById("res-msg").innerText = msgFinal;
+
+    // whatsapp text
+    document.getElementById("text-whatsapp").innerText =
+      `✨ KODLAND CASHBACK ✨\n\n` +
+      `👤 Beneficiário: ${d.nombre}\n` +
+      `💰 Valor: R$ ${d.valor}\n` +
+      `📅 Válido até: ${d.validez}\n` +
+      `📚 Compra mínima: ${aulasMin} aulas\n\n${msgFinal}`;
+
+    // ticket pop + sound
+    const ticket = document.getElementById("ticket-design");
+    ticket.classList.add("popping");
+    setTimeout(() => ticket.classList.remove("popping"), 560);
+    playSuccessSound();
+
+    // swap states
+    document.getElementById("form-state").style.display    = "none";
+    document.getElementById("success-state").style.display = "block";
+    document.getElementById("copy-actions").style.display  = "block";
+    document.getElementById("right-label").innerText = "✓ Ticket gerado";
+
+    btnText.innerHTML = 'GERAR TICKET';
+  })
+  .catch(() => {
+    btnText.innerHTML = 'GERAR TICKET';
+    btn.disabled = false;
+    showToast('Erro ao registrar. Tente novamente. ❌');
+  });
+}
+
+async function copiarImagen() {
+  const canvas = await html2canvas(document.getElementById("ticket-design"), { scale: 3, backgroundColor: null });
+  canvas.toBlob(async blob => {
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+    showToast("Imagem copiada! 🖼️");
+  });
+}
+
+function copiarTexto() {
+  navigator.clipboard.writeText(document.getElementById("text-whatsapp").innerText)
+    .then(() => showToast("Texto copiado! 📄"));
+}
+
+function nuevoTicket() {
+  ["n","v_venta","aulas_compra","p"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("preview-box").style.display   = "none";
+  document.getElementById("copy-actions").style.display  = "none";
+  document.getElementById("success-state").style.display = "none";
+  document.getElementById("form-state").style.display    = "block";
+  document.getElementById("btn-enviar").disabled = true;
+  document.getElementById("right-label").innerText = "Preview em tempo real";
+  cashback = 0; fechaValidezStr = "";
+  updateTicket();
+}
+</script>
+</body>
+</html>

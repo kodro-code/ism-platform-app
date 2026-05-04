@@ -1,0 +1,13 @@
+[
+  { "name": "ISM Leticia Tiburcio Ervilha",      "telegramHandle": "@tiburcioleticia",      "active": true },
+  { "name": "ISM Taíza dos Santos Reis",           "telegramHandle": "@taizareis",            "active": true },
+  { "name": "ISM Moacir de Souza Junqueira",       "telegramHandle": "@moacirjunqueira",      "active": true },
+  { "name": "ISM Alcidelia Valeriano",             "telegramHandle": "@alcideliavaleriano",   "active": true },
+  { "name": "ISM Luana Dias dos Santos",           "telegramHandle": "@luanad1as",            "active": true },
+  { "name": "ISM Bruna Regina Rozza",              "telegramHandle": "@brunarozza",           "active": true },
+  { "name": "ISM Izabela Costa De Oliveira",       "telegramHandle": "@izabelaoliveiraz",     "active": true },
+  { "name": "ISM Juliana Cataldo Braga",           "telegramHandle": "@Julibraga",            "active": true },
+  { "name": "ISM Beatriz Matos Mota",              "telegramHandle": "@belatrizmm",           "active": true },
+  { "name": "ISM Melissa Andreia Fagundes",        "telegramHandle": "@MelissaFagundes",      "active": true },
+  { "name": "ISM Mariana Mischiatti Cavaleiro",    "telegramHandle": "@marianamischiatti",    "active": true }
+]

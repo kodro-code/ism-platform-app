@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #020408;
+      --bg-panel: #0d1117;
+      --border-electric: rgba(59, 130, 246, 0.5);
+      --text-main: #f8fafc;
+      --text-soft: #94a3b8;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --error: #ef4444;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; background: radial-gradient(circle at center, #0f172a 0%, #020408 100%); background-attachment: fixed; color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; box-sizing: border-box; }
+    .container { background: var(--bg-panel); padding: 40px; border-radius: 28px; border: 1.5px solid var(--border-electric); box-shadow: 0 0 30px rgba(59, 130, 246, 0.1), 0 20px 50px rgba(0,0,0,0.5); max-width: 500px; width: 100%; position: relative; }
+    h1 { font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 35px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .form-group { margin-bottom: 22px; position: relative; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-soft); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+    input, select, textarea { width: 100%; padding: 13px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; color: #fff; transition: var(--transition); outline: none; appearance: none; }
+    select option { background-color: #0d1117; color: #fff; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 18px; padding-right: 40px; color-scheme: dark; }
+    input:hover, select:hover, textarea:hover { border-color: var(--success); background: rgba(16, 185, 129, 0.08); transform: translateY(-2px); }
+    .field-valid { border-color: var(--success) !important; }
+    .check-icon { position: absolute; right: 15px; bottom: 13px; color: var(--success); display: none; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    button { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px; border: none; border-radius: 14px; cursor: pointer; font-size: 1rem; font-weight: 700; width: 100%; margin-top: 10px; transition: var(--transition); }
+    button:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
+    .message-container { text-align: center; padding: 30px; border-radius: 20px; margin-top: 20px; display: none; }
+    .loading-message { color: var(--accent); background: rgba(59, 130, 246, 0.05); border: 1px solid var(--accent); }
+    .success-message { color: var(--success); background: rgba(16, 185, 129, 0.05); border: 1px solid var(--success); }
+    .error-message { color: var(--error); background: rgba(239, 68, 68, 0.05); border: 1px solid var(--error); }
+    .retry-btn { background: #ef4444; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="formContent">
+      <h1>Relatório de Vendas</h1>
+      <form id="saleReportForm">
+        <div class="form-group">
+          <label>Gerente (Manager)</label>
+          <select id="manager" name="manager" required disabled>
+            <option value="">Carregando managers...</option>
+          </select>
+          <i class="fas fa-check-circle check-icon" id="managerCheck"></i>
+        </div>
+        <div class="form-group">
+          <label>Link do BO</label>
+          <input type="text" id="amoLink" name="amoLink" required placeholder="https://...">
+          <i class="fas fa-check-circle check-icon" id="amoLinkCheck"></i>
+        </div>
+        <div class="form-group">
+          <label>Forma de Pagamento</label>
+          <select id="paymentType" name="paymentType" required>
+            <option value="">Selecione o Pagamento</option>
+            <option value="Stripe - Full payment">Stripe</option>
+            <option value="Ebanx - Pix - Boleto - Debit Card">Ebanx - Pix / Boleto / Débito</option>
+            <option value="Ebanx - Credit Card">Ebanx - Cartão de Crédito</option>
+            <option value="Deposit">Depósito</option>
+            <option value="Internal installment 1">Parcelamento Interno 1</option>
+            <option value="Internal installment 2">Parcelamento Interno 2</option>
+            <option value="Internal installment 3">Parcelamento Interno 3</option>
+            <option value="Internal installment 4">Parcelamento Interno 4</option>
+          </select>
+          <i class="fas fa-check-circle check-icon" id="paymentTypeCheck"></i>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Valor USD</label>
+            <input type="number" step="0.01" id="amountUsd" name="amountUsd" required>
+            <i class="fas fa-check-circle check-icon" id="amountUsdCheck"></i>
+          </div>
+          <div class="form-group">
+            <label>Valor BRL</label>
+            <input type="number" step="0.01" id="amountBrl" name="amountBrl" required>
+            <i class="fas fa-check-circle check-icon" id="amountBrlCheck"></i>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Número de aulas vendidas</label>
+            <input type="number" id="numLessons" name="numLessons" required>
+            <i class="fas fa-check-circle check-icon" id="numLessonsCheck"></i>
+          </div>
+          <div class="form-group">
+            <label>Curso</label>
+            <select id="course" name="course" required>
+              <option value="">Selecione o Curso</option>
+              <option value="FunTech">FunTech</option>
+              <option value="Scratch">Scratch</option>
+              <option value="Roblox">Roblox</option>
+              <option value="Python LVL 1">Python LVL 1</option>
+              <option value="Python LVL 2">Python LVL 2</option>
+              <option value="DC LVL 1">DC LVL 1</option>
+              <option value="DC LVL 2">DC LVL 2</option>
+              <option value="FWD Pro">FWD Pro</option>
+              <option value="Unity">Unity</option>
+            </select>
+            <i class="fas fa-check-circle check-icon" id="courseCheck"></i>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Formato de estudos</label>
+            <select id="format" name="format" required>
+              <option value="">Selecione o Formato</option>
+              <option value="Premium">Premium</option>
+              <option value="Standard">Standard</option>
+              <option value="Upgrade to PRM">Upgrade para PRM</option>
+              <option value="Upgrade to IND">Upgrade para IND</option>
+            </select>
+            <i class="fas fa-check-circle check-icon" id="formatCheck"></i>
+          </div>
+          <div class="form-group">
+            <label>A qual lista pertence o lead?</label>
+            <select id="workFront" name="workFront" required>
+              <option value="">Selecione a Lista</option>
+              <option value="Prolongation">Prolongation</option>
+              <option value="Upsale Grads">Upsale Grads</option>
+              <option value="FP RP Upsale">FP RP Upsale</option>
+              <option value="Cohort">Cohort</option>
+              <option value="Graduate">Graduate</option>
+              <option value="Referral">Referral</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Adaptation">Adaptation</option>
+            </select>
+            <i class="fas fa-check-circle check-icon" id="workFrontCheck"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Comentário (opcional)</label>
+          <textarea id="comment" name="comment" rows="2" placeholder="Alguma observação extra?"></textarea>
+          <i class="fas fa-check-circle check-icon" id="commentCheck" style="bottom: 45px;"></i>
+        </div>
+        <button type="submit" id="submitBtn" disabled>Confirmar Relatório</button>
+      </form>
+    </div>
+
+    <div class="message-container loading-message" id="loadingMessage">
+      <i class="fas fa-circle-notch fa-spin"></i> Processando...
+    </div>
+    <div class="message-container success-message" id="successMessage"></div>
+    <div class="message-container error-message" id="errorMessage">
+      <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; display: block; margin-bottom: 15px;"></i>
+      <p>Opa! Verifique os campos ou sua conexão com a internet.</p>
+      <button class="retry-btn" onclick="showFormAgain()">Tentar Novamente</button>
+    </div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVUgNnh842kvIZLAkyWG_-uA7vlfAe1W6AyVnDaQGLGSaOXKKt3WwAS_GzkzE7VJYcpw/exec';
+    const MANAGERS_API = '/api/managers';
+
+    const form = document.getElementById('saleReportForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formContent = document.getElementById('formContent');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+
+    function showFormAgain() {
+      errorMessage.style.display = 'none';
+      formContent.style.display = 'block';
+    }
+
+    function resetFormUI() {
+      form.reset();
+      document.querySelectorAll('.field-valid').forEach(el => el.classList.remove('field-valid'));
+      document.querySelectorAll('.check-icon').forEach(el => el.style.display = 'none');
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
+      formContent.style.display = 'block';
+      checkAllRequiredFields();
+    }
+
+    function updateFieldFeedback(element, checkElement) {
+      if (element.checkValidity() && element.value.trim() !== '') {
+        element.classList.add('field-valid');
+        if (checkElement) checkElement.style.display = 'block';
+      } else {
+        element.classList.remove('field-valid');
+        if (checkElement) checkElement.style.display = 'none';
+      }
+    }
+
+    function checkAllRequiredFields() {
+      const requiredInputs = form.querySelectorAll('[required]');
+      let allValid = true;
+      requiredInputs.forEach(input => {
+        if (!input.checkValidity() || input.value.trim() === '') allValid = false;
+      });
+      submitBtn.disabled = !allValid;
+    }
+
+    async function loadManagers() {
+      const select = document.getElementById('manager');
+      try {
+        const res = await fetch(MANAGERS_API);
+        if (!res.ok) throw new Error('API error');
+        const managers = await res.json();
+        select.innerHTML = '<option value="">Selecione um Gerente</option>';
+        managers.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.name;
+          opt.textContent = m.name;
+          select.appendChild(opt);
+        });
+        select.disabled = false;
+      } catch (e) {
+        select.innerHTML = '<option value="">Erro ao carregar managers</option>';
+        select.disabled = true;
+      }
+    }
+    loadManagers();
+
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+      const checkIcon = document.getElementById(input.id + 'Check');
+      ['input', 'change', 'blur'].forEach(evt => {
+        input.addEventListener(evt, () => {
+          updateFieldFeedback(input, checkIcon);
+          checkAllRequiredFields();
+        });
+      });
+    });
+
+    function handleError() {
+      loadingMessage.style.display = 'none';
+      errorMessage.style.display = 'block';
+      formContent.style.display = 'none';
+    }
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      formContent.style.display = 'none';
+      loadingMessage.style.display = 'block';
+
+      const formData = {
+        manager: document.getElementById('manager').value,
+        amoLink: document.getElementById('amoLink').value,
+        paymentType: document.getElementById('paymentType').value,
+        amountUsd: document.getElementById('amountUsd').value,
+        amountBrl: document.getElementById('amountBrl').value,
+        numLessons: document.getElementById('numLessons').value,
+        course: document.getElementById('course').value,
+        format: document.getElementById('format').value,
+        workFront: document.getElementById('workFront').value,
+        comment: document.getElementById('comment').value
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'text/plain' }
+      })
+      .then(r => r.json())
+      .then(function(response) {
+        loadingMessage.style.display = 'none';
+        if (response && response.success) {
+          successMessage.innerHTML = `
+            <i class="fas fa-check-circle" style="font-size: 2.5rem; display: block; margin-bottom: 15px;"></i>
+            <p>Relatório enviado com sucesso!</p>
+            <button onclick="resetFormUI()">Novo Relatório</button>
+          `;
+          successMessage.style.display = 'block';
+        } else {
+          handleError();
+        }
+      })
+      .catch(handleError);
+    });
+  </script>
+</body>
+</html>

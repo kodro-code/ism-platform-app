@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prices — ISM</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090b;--surface:#111113;--surface2:#18181b;--surface3:#27272a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#fafafa;--muted:#71717a;--muted2:#a1a1aa;
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --orange:#f59e0b;--orange-dim:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --blue:#3b82f6;
+  --sky:#38bdf8;--sky-dim:rgba(56,189,248,0.12);
+  --accent:#6366f1;--accent-dim:rgba(99,102,241,0.15);
+  --lime:#a3e635;--lime-dim:rgba(163,230,53,0.12);
+  --violet:#a855f7;--violet-dim:rgba(168,85,247,0.12);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --radius:12px;--radius-sm:7px;--radius-lg:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:13px;}
+
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(9,9,11,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);gap:12px;}
+.logo{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;flex-shrink:0;}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+.level-tabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;}
+.level-tab{padding:5px 16px;border-radius:5px;font-size:12px;font-weight:600;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.level-tab.active{background:var(--surface3);color:var(--text);}
+.topbar-right{display:flex;gap:8px;flex-shrink:0;}
+.btn-gen{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-sm);background:var(--accent);border:none;color:white;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-gen:hover{background:#4f52e8;}
+.btn-nova{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-sm);background:transparent;border:1px solid var(--border2);color:var(--muted2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-nova:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
+
+/* WORKSPACE */
+.workspace{padding:20px;overflow-x:auto;}
+.cards-row{display:flex;gap:12px;min-width:max-content;align-items:flex-start;}
+
+/* PACKAGE CARD */
+.pkg-card{width:292px;flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s;position:relative;}
+.pkg-card:hover{border-color:var(--border2);}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 0;}
+.card-num{font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--muted);}
+.card-close{width:20px;height:20px;border-radius:50%;background:var(--surface3);border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.card-close:hover{background:var(--red-dim);color:var(--red);}
+.cuotas-section{padding:8px 14px 10px;border-bottom:1px solid var(--border);}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.cuotas-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:5px;}
+.cuota-btn{padding:6px 2px;border-radius:5px;border:1px solid var(--border2);background:var(--bg);color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;}
+.cuota-btn.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+.card-body{padding:10px 14px 14px;}
+.aulas-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.aulas-pill{display:inline-flex;align-items:center;gap:5px;background:var(--sky-dim);border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--sky);}
+.real-price-pill{display:inline-flex;align-items:center;gap:5px;background:var(--sky-dim);border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--sky);}
+.real-price-pill .rp-label{font-size:9px;font-weight:600;opacity:.75;letter-spacing:.3px;text-transform:uppercase;}
+.real-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--muted);border:1px solid var(--border2);transition:all .2s;}
+.input-row{display:grid;grid-template-columns:1fr 1.6fr;gap:8px;margin-bottom:8px;}
+.field label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:4px;}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--surface3);font-weight:400;}
+
+/* CALC MODE TOGGLE — new */
+.calc-mode-toggle{display:flex;gap:3px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:3px;margin-bottom:8px;}
+.calc-mode-btn{flex:1;padding:5px 8px;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.3px;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;font-family:var(--font);}
+.calc-mode-btn.active{background:var(--accent);color:white;}
+.calc-mode-btn.active-pct{background:var(--orange);color:#000;}
+
+/* Computed value display */
+.computed-val{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.computed-val-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.computed-val-num{font-size:13px;font-weight:800;color:var(--orange);}
+
+.iof-toggle{display:flex;gap:3px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:3px;margin-bottom:10px;}
+.iof-btn{flex:1;padding:4px 8px;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.3px;cursor:pointer;border-radius:4px;transition:all .15s;text-transform:uppercase;}
+.iof-btn.active{background:var(--blue);color:white;}
+.thermo-wrap{margin:2px 0 12px;position:relative;}
+.thermo-track{height:5px;border-radius:3px;background:var(--bg);border:1px solid var(--border2);display:flex;overflow:hidden;}
+.thermo-seg{flex:1;opacity:.15;transition:opacity .3s;}
+.thermo-seg.on{opacity:1;}
+.thermo-seg:first-child{border-radius:3px 0 0 3px;}
+.thermo-seg:last-child{border-radius:0 3px 3px 0;}
+.thermo-ptr{position:absolute;top:-9px;min-width:56px;height:20px;border-radius:5px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000;background:var(--surface3);transition:left .4s cubic-bezier(.34,1.56,.64,1),background .3s;border:1.5px solid var(--bg);pointer-events:none;}
+.price-block{text-align:center;padding:6px 0 10px;}
+.price-installment{font-size:11px;color:var(--sky);font-weight:600;min-height:16px;margin-bottom:3px;}
+.price-main-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.price-total{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.cashback-badge{display:none;align-items:center;gap:4px;background:var(--lime-dim);border:1px solid rgba(163,230,53,.3);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--lime);white-space:nowrap;transition:all .2s;}
+.cashback-badge.visible{display:inline-flex;}
+.cashback-badge-sm{display:none;align-items:center;gap:4px;background:var(--lime-dim);border:1px solid rgba(163,230,53,.3);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--lime);white-space:nowrap;transition:all .2s;}
+.cashback-badge-sm.visible{display:inline-flex;}
+.price-discount-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:5px;}
+.price-off-badge{display:inline-flex;align-items:center;background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;}
+.price-economy{font-size:11px;color:var(--muted);}
+.price-link-box{margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--muted2);text-align:center;}
+.price-link-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.status-bar{margin-top:8px;padding:6px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;text-align:center;background:var(--surface2);color:var(--muted);transition:all .2s;}
+.include-toggle{display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;}
+.toggle-track{width:26px;height:15px;border-radius:8px;background:var(--surface3);border:1px solid var(--border2);position:relative;transition:background .2s;}
+.toggle-thumb{width:10px;height:10px;border-radius:50%;background:var(--muted);position:absolute;top:2px;left:2px;transition:all .2s;}
+.toggle-track.on{background:var(--accent);border-color:var(--accent);}
+.toggle-track.on .toggle-thumb{left:13px;background:white;}
+.toggle-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;}
+
+/* LIMITS BOX */
+.limits-box{background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:10px;}
+.limits-box-title{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+.lim-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;margin-bottom:4px;}
+.lim-row:last-child{margin-bottom:0;}
+.lim-tag{font-size:9px;font-weight:700;white-space:nowrap;min-width:78px;}
+.lim-val{font-size:10px;font-weight:700;}
+
+/* UPGRADE SECTION inside normal cards */
+.upgrade-section{border-top:1px solid var(--border);padding:10px 14px 14px;background:rgba(56,189,248,.02);}
+.upgrade-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;}
+.upgrade-title{font-size:10px;font-weight:700;color:var(--sky);letter-spacing:.3px;text-transform:uppercase;}
+.factor-badge{font-size:9px;color:var(--muted);}
+.upg-real-pill{display:inline-flex;align-items:center;gap:5px;background:var(--sky-dim);border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700;color:var(--sky);margin-bottom:8px;}
+.upg-real-pill .rp-label{font-size:9px;font-weight:600;opacity:.75;letter-spacing:.3px;text-transform:uppercase;}
+.upgrade-input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.upg-price-block{text-align:center;padding:6px 0 10px;}
+.upg-price-installment{font-size:11px;color:var(--sky);font-weight:600;min-height:16px;margin-bottom:3px;}
+.upg-price-main-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.upg-price-total{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.upg-price-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;}
+.upg-off-badge{display:inline-flex;align-items:center;background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;}
+.upg-economy{font-size:11px;color:var(--muted);}
+.upg-link-box{margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--muted2);text-align:center;}
+
+.courses-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);position:relative;}
+.courses-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.courses-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.courses-add-btn{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid var(--border2);background:var(--bg);color:var(--muted2);cursor:pointer;transition:all .15s;font-family:var(--font);}
+.courses-add-btn:hover{border-color:var(--sky);color:var(--sky);background:var(--sky-dim);}
+.courses-dropdown{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;overflow:hidden;}
+.courses-dropdown.open{display:block;}
+.dropdown-search{padding:7px 8px;border-bottom:1px solid var(--border);}
+.dropdown-search input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:5px 8px;color:var(--text);font-family:var(--font);font-size:11px;outline:none;}
+.dropdown-search input:focus{border-color:var(--sky);}
+.dropdown-list{max-height:180px;overflow-y:auto;}
+.dropdown-item{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;transition:background .1s;font-size:11px;font-weight:500;color:var(--muted2);}
+.dropdown-item:hover{background:var(--surface2);}
+.dropdown-item.selected{color:var(--sky);}
+.dropdown-item-check{width:14px;height:14px;border-radius:3px;flex-shrink:0;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.dropdown-item.selected .dropdown-item-check{background:var(--sky);border-color:var(--sky);}
+.dropdown-item.selected .dropdown-item-check::after{content:'✓';color:white;font-size:8px;font-weight:700;}
+.selected-courses{display:flex;flex-wrap:wrap;gap:5px;min-height:4px;}
+.selected-chip{display:flex;align-items:center;gap:5px;padding:3px 8px 3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--sky-dim);border:1px solid rgba(56,189,248,.35);color:var(--sky);white-space:nowrap;}
+.selected-chip-remove{width:14px;height:14px;border-radius:50%;border:none;background:rgba(56,189,248,.2);color:var(--sky);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;font-family:var(--font);}
+.selected-chip-remove:hover{background:var(--red-dim);color:var(--red);}
+
+.add-card{width:52px;flex-shrink:0;border:1.5px dashed var(--border2);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:20px;transition:all .15s;align-self:stretch;min-height:180px;}
+.add-card:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.inviable-overlay{position:absolute;inset:0;background:rgba(9,9,11,.78);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:var(--radius-lg);z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;}
+.inviable-overlay.show{opacity:1;pointer-events:auto;}
+.inviable-label{background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-sm);padding:6px 14px;font-size:11px;font-weight:700;}
+.inviable-refresh-btn{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border2);color:var(--muted2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;}
+.inviable-refresh-btn:hover{background:var(--sky-dim);border-color:var(--sky);color:var(--sky);}
+
+/* UPGRADE COL inviable overlay */
+.upg-col-wrap{position:relative;}
+.upg-inv-overlay{position:absolute;inset:0;background:rgba(9,9,11,.80);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:var(--radius-lg);z-index:5;pointer-events:none;opacity:0;transition:opacity .2s;}
+.upg-inv-overlay.show{opacity:1;pointer-events:auto;}
+.upg-col-title{font-size:11px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.upg-summary{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-top:6px;}
+.upg-sr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.upg-st{border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+
+/* MIXTO */
+.mix-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;display:flex;flex-direction:column;gap:0;}
+.mix-col-title{font-size:11px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.mix-new-pkg{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:12px;position:relative;}
+.mix-new-pkg-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--violet);color:white;font-size:10px;font-weight:800;flex-shrink:0;}
+.mix-new-pkg-remove{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--surface3);border:none;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.mix-new-pkg-remove:hover{background:var(--red-dim);color:var(--red);}
+.add-mix-pkg-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border:1.5px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font);margin-top:10px;}
+.add-mix-pkg-btn:hover{border-color:var(--violet);color:var(--violet);background:var(--violet-dim);}
+.acum-box{background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(99,102,241,.07));border:1px solid rgba(168,85,247,.3);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;}
+.acum-box-title{font-size:9px;color:var(--violet);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:1500px;height:92vh;overflow:hidden;display:grid;grid-template-columns:280px 1fr;position:relative;}
+.modal-left{padding:20px;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.modal-right{padding:20px;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:3px;}
+.modal-subtitle{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.offer-pkg{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;}
+.offer-pkg-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.offer-pkg-num{width:18px;height:18px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.offer-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.offer-item:last-child{border-bottom:none;}
+.offer-item-left{display:flex;align-items:center;gap:8px;}
+.offer-checkbox{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.offer-checkbox.checked{background:var(--accent);border-color:var(--accent);}
+.offer-checkbox.checked::after{content:'✓';color:white;font-size:8px;font-weight:700;}
+.offer-item-name{font-size:11px;font-weight:600;}
+.offer-item-type{font-size:10px;color:var(--muted);}
+.offer-item-price{font-size:12px;font-weight:700;}
+.modal-actions{display:flex;gap:8px;margin-top:14px;}
+.btn-action{flex:1;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-action:hover{background:var(--surface3);}
+.btn-action.primary{background:var(--accent);border-color:var(--accent);}
+.btn-action.primary:hover{background:#4f52e8;}
+.preview-tabs{display:flex;gap:2px;margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;}
+.preview-tab{flex:1;padding:5px;border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;text-transform:uppercase;}
+.preview-tab.active{background:var(--surface2);color:var(--text);}
+.preview-pane{display:none;}
+.preview-pane.active{display:block;}
+.preview-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+.wa-preview{background:#0b141a;border-radius:var(--radius);padding:14px;font-family:-apple-system,sans-serif;font-size:13px;color:#d1d7db;min-height:120px;white-space:pre-wrap;line-height:1.6;border:1px solid rgba(255,255,255,.05);max-height:300px;overflow-y:auto;}
+.img-preview-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);}
+#offer-canvas{display:block;width:100%;height:auto;}
+.modal-close-btn{position:absolute;top:18px;right:18px;width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;}
+.confirm-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px;max-width:340px;width:100%;text-align:center;}
+.confirm-title{font-size:14px;font-weight:700;margin-bottom:6px;}
+.confirm-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.confirm-actions{display:flex;gap:8px;}
+.btn-confirm-cancel{flex:1;padding:9px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;}
+.btn-confirm-ok{flex:1;padding:9px;border-radius:var(--radius-sm);border:none;background:var(--red);color:white;font-size:12px;font-weight:700;cursor:pointer;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 16px;font-size:12px;font-weight:600;color:var(--text);z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>Sales ISM <span style="font-size:10px;color:var(--muted);font-weight:400;">v21</span></div>
+  <div class="level-tabs">
+    <button class="level-tab active" onclick="setNivel('padron')">Padrão</button>
+    <button class="level-tab" onclick="setNivel('premium')">Premium</button>
+    <button class="level-tab" onclick="setNivel('individual')">Individual</button>
+    <button class="level-tab" onclick="setNivel('upgrade')" style="color:#38bdf8;">↑ Upgrade</button>
+    <button class="level-tab" onclick="setNivel('mixto')" style="color:#a855f7;">⇄ Mixto</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex:1;max-width:240px;">
+    <label style="font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;">Aluno</label>
+    <input type="text" id="student-name" placeholder="Nome do aluno..." oninput="onNameChange()"
+      style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .15s;"
+      onfocus="this.style.borderColor='var(--sky)'" onblur="this.style.borderColor='var(--border2)'">
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+    <label style="font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;">Válido até</label>
+    <input type="date" id="validity-date" oninput="onNameChange()"
+      style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .15s;color-scheme:dark;"
+      onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border2)'">
+  </div>
+  <div class="topbar-right">
+    <button class="btn-nova" onclick="confirmNova()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.01"/></svg>
+      Nova Proposta
+    </button>
+    <button class="btn-gen" onclick="openModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      Gerar Oferta
+    </button>
+  </div>
+</div>
+
+<!-- NORMAL -->
+<div class="workspace" id="ws-normal">
+  <div class="cards-row" id="cards-row">
+    <div class="add-card" onclick="addCard()" title="Novo pacote">+</div>
+  </div>
+</div>
+
+<!-- UPGRADE -->
+<div id="ws-upgrade" style="display:none;padding:20px;">
+  <div style="max-width:820px;margin:0 auto;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">📋 Contrato Original do Aluno</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr;gap:12px;margin-bottom:14px;">
+        <div class="field"><label>Aulas Contratadas</label><input type="number" id="upg-orig" placeholder="Ex: 40" oninput="calcUpgrade()"></div>
+        <div class="field"><label>Valor Pago (R$)</label><input type="number" id="upg-pago" placeholder="Ex: 2000" oninput="calcUpgrade()"></div>
+        <div class="field"><label>Aulas Restantes</label><input type="number" id="upg-rest" placeholder="Ex: 30" oninput="calcUpgrade()"></div>
+        <div class="field"><label>Parcelas</label><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:4px;" id="upg-cuotas"></div></div>
+      </div>
+      <div style="padding:12px 14px;background:var(--surface2);border-radius:var(--radius-sm);display:flex;gap:28px;flex-wrap:wrap;">
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">R$/aula original</div><div style="font-size:18px;font-weight:700;" id="upg-rpa">--</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">Saldo disponível</div><div style="font-size:18px;font-weight:700;color:var(--sky);" id="upg-saldo">R$ --</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">Aulas restantes</div><div style="font-size:18px;font-weight:700;" id="upg-rest-disp">--</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <!-- Premium -->
+      <div class="upg-col" id="upg-col-prem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+          <span class="upg-real-pill"><span class="rp-label">Preço real</span><span id="upg-anc-prem">--</span></span>
+        </div>
+        <div class="limits-box" id="upg-lbox-prem" style="display:none;">
+          <div class="limits-box-title">Guia de valores (aulas restantes)</div>
+          <div class="lim-row" style="background:var(--red-dim);border:1px solid var(--red);"><span class="lim-tag" style="color:var(--red);">🔴 INVIÁVEL</span><span class="lim-val" style="color:var(--red);" id="upg-li-prem">--</span></div>
+          <div class="lim-row" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);"><span class="lim-tag" style="color:var(--red);">🔴 CONSULTAR</span><span class="lim-val" style="color:var(--red);" id="upg-lr-prem">--</span></div>
+          <div class="lim-row" style="background:var(--orange-dim);border:1px solid var(--orange);"><span class="lim-tag" style="color:var(--orange);">🟡 NEGOC.</span><span class="lim-val" style="color:var(--orange);" id="upg-ln-prem">--</span></div>
+          <div class="lim-row" style="background:var(--green-dim);border:1px solid var(--green);"><span class="lim-tag" style="color:var(--green);">🟢 IDEAL</span><span class="lim-val" style="color:var(--green);" id="upg-lo-prem">--</span></div>
+        </div>
+        <div class="field" style="margin-bottom:8px;"><label>Valor total paquete novo (R$)</label><input type="number" id="upg-val-prem" placeholder="Ex: 5600" oninput="calcUpgrade()"></div>
+        <div class="iof-toggle" style="margin-bottom:8px;"><button class="iof-btn active" id="upg-iof-prem-off" onclick="setUpgIOF('prem',false)">Sem IOF</button><button class="iof-btn" id="upg-iof-prem-on" onclick="setUpgIOF('prem',true)">Com IOF</button></div>
+        <div class="thermo-wrap"><div class="thermo-track"><div class="thermo-seg" id="upg-tr-prem" style="background:var(--red)"></div><div class="thermo-seg" id="upg-to-prem" style="background:var(--orange)"></div><div class="thermo-seg" id="upg-tg-prem" style="background:var(--green)"></div></div><div class="thermo-ptr" id="upg-ptr-prem" style="left:50%">--%</div></div>
+        <div class="upg-summary">
+          <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px;">Resumo</div>
+          <div class="upg-sr"><span style="font-size:11px;color:var(--muted2);">Valor paquete novo</span><span style="font-size:12px;font-weight:700;" id="upg-tot-prem">--</span></div>
+          <div class="upg-sr"><span style="font-size:11px;color:var(--muted2);">Saldo disponível</span><span style="font-size:12px;font-weight:600;color:var(--sky);" id="upg-saldo-prem">--</span></div>
+          <div class="upg-st"><span style="font-size:13px;font-weight:700;">Cliente paga</span><span style="font-size:22px;font-weight:800;color:var(--sky);" id="upg-diff-prem">--</span></div>
+          <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:5px;" id="upg-parc-prem"></div>
+        </div>
+        <div style="margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;text-align:center;">
+          <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Link Backoffice (diferença líquida)</div>
+          <div style="font-size:11px;color:var(--muted2);" id="upg-link-prem">--</div>
+        </div>
+        <div class="status-bar" id="upg-status-prem" style="margin-top:8px;">AGUARDANDO VALORES</div>
+        <div class="include-toggle" onclick="togUpgInc('prem')" style="margin-top:10px;"><div class="toggle-track" id="upg-inc-prem"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+      </div>
+      <!-- Individual -->
+      <div class="upg-col" id="upg-col-ind">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+          <span class="upg-real-pill"><span class="rp-label">Preço real</span><span id="upg-anc-ind">--</span></span>
+        </div>
+        <div class="limits-box" id="upg-lbox-ind" style="display:none;">
+          <div class="limits-box-title">Guia de valores (aulas restantes)</div>
+          <div class="lim-row" style="background:var(--red-dim);border:1px solid var(--red);"><span class="lim-tag" style="color:var(--red);">🔴 INVIÁVEL</span><span class="lim-val" style="color:var(--red);" id="upg-li-ind">--</span></div>
+          <div class="lim-row" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);"><span class="lim-tag" style="color:var(--red);">🔴 CONSULTAR</span><span class="lim-val" style="color:var(--red);" id="upg-lr-ind">--</span></div>
+          <div class="lim-row" style="background:var(--orange-dim);border:1px solid var(--orange);"><span class="lim-tag" style="color:var(--orange);">🟡 NEGOC.</span><span class="lim-val" style="color:var(--orange);" id="upg-ln-ind">--</span></div>
+          <div class="lim-row" style="background:var(--green-dim);border:1px solid var(--green);"><span class="lim-tag" style="color:var(--green);">🟢 IDEAL</span><span class="lim-val" style="color:var(--green);" id="upg-lo-ind">--</span></div>
+        </div>
+        <div class="field" style="margin-bottom:8px;"><label>Valor total paquete novo (R$)</label><input type="number" id="upg-val-ind" placeholder="Ex: 9600" oninput="calcUpgrade()"></div>
+        <div class="iof-toggle" style="margin-bottom:8px;"><button class="iof-btn active" id="upg-iof-ind-off" onclick="setUpgIOF('ind',false)">Sem IOF</button><button class="iof-btn" id="upg-iof-ind-on" onclick="setUpgIOF('ind',true)">Com IOF</button></div>
+        <div class="thermo-wrap"><div class="thermo-track"><div class="thermo-seg" id="upg-tr-ind" style="background:var(--red)"></div><div class="thermo-seg" id="upg-to-ind" style="background:var(--orange)"></div><div class="thermo-seg" id="upg-tg-ind" style="background:var(--green)"></div></div><div class="thermo-ptr" id="upg-ptr-ind" style="left:50%">--%</div></div>
+        <div class="upg-summary">
+          <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px;">Resumo</div>
+          <div class="upg-sr"><span style="font-size:11px;color:var(--muted2);">Valor paquete novo</span><span style="font-size:12px;font-weight:700;" id="upg-tot-ind">--</span></div>
+          <div class="upg-sr"><span style="font-size:11px;color:var(--muted2);">Saldo disponível</span><span style="font-size:12px;font-weight:600;color:var(--sky);" id="upg-saldo-ind">--</span></div>
+          <div class="upg-st"><span style="font-size:13px;font-weight:700;">Cliente paga</span><span style="font-size:22px;font-weight:800;color:var(--sky);" id="upg-diff-ind">--</span></div>
+          <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:5px;" id="upg-parc-ind"></div>
+        </div>
+        <div style="margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;text-align:center;">
+          <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Link Backoffice (diferença líquida)</div>
+          <div style="font-size:11px;color:var(--muted2);" id="upg-link-ind">--</div>
+        </div>
+        <div class="status-bar" id="upg-status-ind" style="margin-top:8px;">AGUARDANDO VALORES</div>
+        <div class="include-toggle" onclick="togUpgInc('ind')" style="margin-top:10px;"><div class="toggle-track" id="upg-inc-ind"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MIXTO -->
+<div id="ws-mixto" style="display:none;padding:20px;">
+  <div style="max-width:960px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 16px;background:var(--violet-dim);border:1px solid rgba(168,85,247,.3);border-radius:var(--radius);">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--violet);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--violet);">Cálculo Mixto — Acumulativo</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px;">Cada coluna é independente. Pacotes novos se acumulam dentro da coluna.</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">📋 Contrato Original do Aluno</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="field"><label>Aulas Contratadas</label><input type="number" id="mix-orig" placeholder="Ex: 40" oninput="calcMixto()"></div>
+        <div class="field"><label>Valor Pago (R$)</label><input type="number" id="mix-pago" placeholder="Ex: 1800" oninput="calcMixto()"></div>
+        <div class="field"><label>Aulas Restantes</label><input type="number" id="mix-rest" placeholder="Ex: 10" oninput="calcMixto()"></div>
+      </div>
+      <div style="padding:12px 14px;background:var(--surface2);border-radius:var(--radius-sm);display:flex;gap:28px;flex-wrap:wrap;">
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">R$/aula original</div><div style="font-size:18px;font-weight:700;" id="mix-rpa">--</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">Saldo disponível</div><div style="font-size:18px;font-weight:700;color:var(--sky);" id="mix-saldo">R$ --</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:3px;">Aulas restantes</div><div style="font-size:18px;font-weight:700;" id="mix-rest-disp">--</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <!-- PREMIUM COLUMN -->
+      <div class="mix-col" id="mix-col-prem">
+        <div class="mix-col-title">⬆ Coluna Premium</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:0;">
+          <div style="font-size:10px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;">Diferença do upgrade</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+            <span class="upg-real-pill" style="margin-bottom:0;"><span class="rp-label">Preço real</span><span id="mix-anc-prem">--</span></span>
+          </div>
+          <div class="limits-box" id="mix-lbox-upg-prem" style="display:none;">
+            <div class="limits-box-title">Guia — upgrade premium</div>
+            <div class="lim-row" style="background:var(--red-dim);border:1px solid var(--red);"><span class="lim-tag" style="color:var(--red);">🔴 INVIÁVEL</span><span class="lim-val" style="color:var(--red);" id="mix-li-upg-prem">--</span></div>
+            <div class="lim-row" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);"><span class="lim-tag" style="color:var(--red);">🔴 CONSULTAR</span><span class="lim-val" style="color:var(--red);" id="mix-lr-upg-prem">--</span></div>
+            <div class="lim-row" style="background:var(--orange-dim);border:1px solid var(--orange);"><span class="lim-tag" style="color:var(--orange);">🟡 NEGOC.</span><span class="lim-val" style="color:var(--orange);" id="mix-ln-upg-prem">--</span></div>
+            <div class="lim-row" style="background:var(--green-dim);border:1px solid var(--green);"><span class="lim-tag" style="color:var(--green);">🟢 IDEAL</span><span class="lim-val" style="color:var(--green);" id="mix-lo-upg-prem">--</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+            <div class="field"><label>Valor (R$)</label><input type="number" id="mix-val-upg-prem" placeholder="Ex: 800" oninput="calcMixto()"></div>
+            <div><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:4px;">IOF</label>
+              <div class="iof-toggle" style="margin-bottom:0;"><button class="iof-btn active" id="mix-iof-upg-prem-off" onclick="setMixUpgIOF('prem',false)">Sem</button><button class="iof-btn" id="mix-iof-upg-prem-on" onclick="setMixUpgIOF('prem',true)">Com</button></div>
+            </div>
+          </div>
+          <div style="margin-bottom:4px;"><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:3px;">Parcelas da diferença</label><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;" id="mix-cuotas-upg-prem"></div></div>
+          <div class="thermo-wrap" style="margin-top:10px;"><div class="thermo-track"><div class="thermo-seg" id="mix-tr-upg-prem" style="background:var(--red)"></div><div class="thermo-seg" id="mix-to-upg-prem" style="background:var(--orange)"></div><div class="thermo-seg" id="mix-tg-upg-prem" style="background:var(--green)"></div></div><div class="thermo-ptr" id="mix-ptr-upg-prem" style="left:50%">--%</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+            <span style="font-size:11px;color:var(--muted2);">Diferença a pagar</span>
+            <span style="font-size:16px;font-weight:800;color:var(--sky);" id="mix-diff-prem">--</span>
+          </div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;" id="mix-parc-upg-prem"></div>
+          <div class="status-bar" id="mix-status-upg-prem" style="margin-top:6px;">AGUARDANDO</div>
+          <div class="include-toggle" onclick="togMixUpgInc('prem')" style="margin-top:8px;"><div class="toggle-track on" id="mix-upg-inc-prem"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+        </div>
+        <div id="mix-pkgs-prem"></div>
+        <button class="add-mix-pkg-btn" onclick="addMixPkg('prem')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Pacote novo (Premium)
+        </button>
+      </div>
+      <!-- INDIVIDUAL COLUMN -->
+      <div class="mix-col" id="mix-col-ind">
+        <div class="mix-col-title">⬆ Coluna Individual</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:0;">
+          <div style="font-size:10px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;">Diferença do upgrade</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+            <span class="upg-real-pill" style="margin-bottom:0;"><span class="rp-label">Preço real</span><span id="mix-anc-ind">--</span></span>
+          </div>
+          <div class="limits-box" id="mix-lbox-upg-ind" style="display:none;">
+            <div class="limits-box-title">Guia — upgrade individual</div>
+            <div class="lim-row" style="background:var(--red-dim);border:1px solid var(--red);"><span class="lim-tag" style="color:var(--red);">🔴 INVIÁVEL</span><span class="lim-val" style="color:var(--red);" id="mix-li-upg-ind">--</span></div>
+            <div class="lim-row" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);"><span class="lim-tag" style="color:var(--red);">🔴 CONSULTAR</span><span class="lim-val" style="color:var(--red);" id="mix-lr-upg-ind">--</span></div>
+            <div class="lim-row" style="background:var(--orange-dim);border:1px solid var(--orange);"><span class="lim-tag" style="color:var(--orange);">🟡 NEGOC.</span><span class="lim-val" style="color:var(--orange);" id="mix-ln-upg-ind">--</span></div>
+            <div class="lim-row" style="background:var(--green-dim);border:1px solid var(--green);"><span class="lim-tag" style="color:var(--green);">🟢 IDEAL</span><span class="lim-val" style="color:var(--green);" id="mix-lo-upg-ind">--</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+            <div class="field"><label>Valor (R$)</label><input type="number" id="mix-val-upg-ind" placeholder="Ex: 1200" oninput="calcMixto()"></div>
+            <div><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:4px;">IOF</label>
+              <div class="iof-toggle" style="margin-bottom:0;"><button class="iof-btn active" id="mix-iof-upg-ind-off" onclick="setMixUpgIOF('ind',false)">Sem</button><button class="iof-btn" id="mix-iof-upg-ind-on" onclick="setMixUpgIOF('ind',true)">Com</button></div>
+            </div>
+          </div>
+          <div style="margin-bottom:4px;"><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:3px;">Parcelas da diferença</label><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;" id="mix-cuotas-upg-ind"></div></div>
+          <div class="thermo-wrap" style="margin-top:10px;"><div class="thermo-track"><div class="thermo-seg" id="mix-tr-upg-ind" style="background:var(--red)"></div><div class="thermo-seg" id="mix-to-upg-ind" style="background:var(--orange)"></div><div class="thermo-seg" id="mix-tg-upg-ind" style="background:var(--green)"></div></div><div class="thermo-ptr" id="mix-ptr-upg-ind" style="left:50%">--%</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+            <span style="font-size:11px;color:var(--muted2);">Diferença a pagar</span>
+            <span style="font-size:16px;font-weight:800;color:var(--sky);" id="mix-diff-ind">--</span>
+          </div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;" id="mix-parc-upg-ind"></div>
+          <div class="status-bar" id="mix-status-upg-ind" style="margin-top:6px;">AGUARDANDO</div>
+          <div class="include-toggle" onclick="togMixUpgInc('ind')" style="margin-top:8px;"><div class="toggle-track on" id="mix-upg-inc-ind"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+        </div>
+        <div id="mix-pkgs-ind"></div>
+        <button class="add-mix-pkg-btn" onclick="addMixPkg('ind')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Pacote novo (Individual)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close-btn" onclick="closeModal()">×</button>
+    <div class="modal-left">
+      <div class="modal-title">Gerar Oferta</div>
+      <div class="modal-subtitle" id="modal-sub">Selecione os pacotes e variantes</div>
+      <div id="offer-pkg-list"></div>
+      <div class="modal-actions">
+        <button class="btn-action" onclick="copyWA()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Copiar WA</button>
+        <button class="btn-action primary" onclick="downloadImg()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar Imagem</button>
+      </div>
+    </div>
+    <div class="modal-right">
+      <div class="preview-tabs">
+        <button class="preview-tab active" onclick="switchPreview('wa')">WhatsApp</button>
+        <button class="preview-tab" onclick="switchPreview('img')">Imagem</button>
+      </div>
+      <div class="preview-pane active" id="pane-wa"><div class="preview-label">Preview</div><div class="wa-preview" id="wa-text">...</div></div>
+      <div class="preview-pane" id="pane-img"><div class="preview-label">Imagem</div><div class="img-preview-wrap"><canvas id="offer-canvas"></canvas></div><button class="btn-action" style="width:100%;margin-top:8px;" onclick="downloadImg()">Baixar PNG</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title">Nova Proposta</div>
+    <div class="confirm-sub">Todos os pacotes serão apagados. Tem certeza?</div>
+    <div class="confirm-actions"><button class="btn-confirm-cancel" onclick="closeConfirm()">Cancelar</button><button class="btn-confirm-ok" onclick="execNova()">Sim, limpar</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════
+   CONFIG
+═══════════════════════════ */
+const CFG={
+  IOF:1.035,
+  ANCLA:{padron:70,premium:120,individual:170},
+  REAL:{padron:60,premium:110,individual:130},
+  LIM:{
+    padron:         {inv:32.5, red:37.5, ora:42.5},
+    upgrade_premium:{inv:50,   red:60,   ora:67.5},
+    premium_pure:   {inv:60,   red:67.5, ora:82.5},
+    individual:     {inv:82.5, red:87.5, ora:107.5},
+  }
+};
+const CURSOS=['FUNTECH','SCRATCH','ROBLOX','PYTHON NV.1','PYTHON NV.2','CREATIVIDADE DIGITAL 1','CREATIVIDADE DIGITAL 2','DESING DE MUNDOS PRO','UNITY'];
+
+/* ═══════════════════════════
+   CALC MODE STATE
+   'val' = input is total package value (default)
+   'pct' = input is discount percentage, value computed from ancla
+═══════════════════════════ */
+const cardCalcMode={}; // id -> 'val' | 'pct'
+
+function getCalcMode(id){return cardCalcMode[id]||'val';}
+function setCalcMode(id,mode){
+  cardCalcMode[id]=mode;
+  // Update toggle appearance
+  const btnVal=$(`cm-val-${id}`), btnPct=$(`cm-pct-${id}`);
+  if(btnVal){btnVal.classList.toggle('active',mode==='val');btnVal.classList.remove('active-pct');}
+  if(btnPct){btnPct.classList.remove('active');btnPct.classList.toggle('active-pct',mode==='pct');}
+  // Swap label on input field
+  const lbl=$(`val-label-${id}`);
+  if(lbl)lbl.textContent=mode==='val'?'Valor Fechamento':'Desconto (%)';
+  const inp=$(`val-${id}`);
+  if(inp){
+    inp.placeholder=mode==='val'?'R$ 0,00':'Ex: 35';
+    inp.min=mode==='pct'?'0':'';
+    inp.max=mode==='pct'?'99':'';
+    inp.value=''; // clear when switching
+  }
+  // Show/hide computed value display
+  const cv=$(`computed-val-${id}`);
+  if(cv)cv.style.display=mode==='pct'?'flex':'none';
+  runCard(id);
+}
+
+/* Given aulas and mode inputs, resolve the actual closing value (vc before/after IOF) */
+function resolveVal(id,nAulas){
+  const mode=getCalcMode(id);
+  const rawInput=+$(`val-${id}`)?.value||0;
+  if(!rawInput||!nAulas)return 0;
+  if(mode==='val'){
+    return rawInput;
+  } else {
+    // pct mode: rawInput is discount %; value = ancla * (1 - pct/100)
+    const n=nivel; // current tab level
+    const ancla=CFG.ANCLA[n]*nAulas;
+    const pct=Math.min(Math.max(rawInput,0),99);
+    return ancla*(1-pct/100);
+  }
+}
+
+function updateComputedDisplay(id,computedVal){
+  const el=$(`computed-num-${id}`);
+  if(el)el.textContent=computedVal>0?('R$ '+fmtN(computedVal)):'--';
+}
+
+/* ═══════════════════════════
+   UTILS
+═══════════════════════════ */
+const $=id=>document.getElementById(id);
+const fmtN=v=>Math.round(v).toLocaleString('pt-BR');
+const fmtBR=(v,d=0)=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtDec=(v,d=2)=>v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+function sid(id,txt){const el=$(id);if(el)el.textContent=txt;}
+
+function calcCashback(v){
+  if(!v||v<200)return 0;
+  if(v<500)return v*.05;if(v<1400)return v*.075;
+  if(v<3000)return v*.10;if(v<4000)return 350;return 400;
+}
+
+function setCB(elId,val){
+  const el=$(elId);if(!el)return;
+  const cb=calcCashback(val);
+  if(cb>0){el.textContent='💸 Cashback R$ '+fmtDec(cb);el.classList.add('visible');}
+  else{el.textContent='';el.classList.remove('visible');}
+}
+
+function calcPreco(valDig,comIOF,nAulas,regra,nivel){
+  if(!valDig||!nAulas)return null;
+  const ancla=CFG.ANCLA[nivel]*nAulas,lim=CFG.LIM[regra];
+  let vc,vl;
+  if(comIOF){vc=valDig;vl=valDig/CFG.IOF;}else{vl=valDig;vc=valDig*CFG.IOF;}
+  const desc=ancla>0?(1-vc/ancla)*100:0;
+  const econ=Math.round(ancla-vc);
+  const real=CFG.REAL[nivel]*nAulas;
+  const marg=real>0?(1-vl/real)*100:0;
+  const lpa=vl/nAulas;
+  const inv=lpa<lim.inv;
+  const cor=lpa>=lim.ora?'green':lpa>=lim.red?'orange':'red';
+  return{vc,vl,link:vl,ancla,desc,econ,marg,cor,inv};
+}
+
+function applyThermo(ptrId,rId,oId,gId,res){
+  const ptr=$(ptrId),r=$(rId),o=$(oId),g=$(gId);
+  if(!res){[r,o,g].forEach(s=>s?.classList.remove('on'));if(ptr){ptr.style.left='50%';ptr.textContent='--%';ptr.style.background='var(--surface3)';ptr.style.color='var(--muted)';}return;}
+  [r,o,g].forEach(s=>s?.classList.add('on'));
+  const pct=Math.round(res.desc),cv=res.cor==='green'?'var(--green)':res.cor==='orange'?'var(--orange)':'var(--red)';
+  if(ptr){ptr.textContent=pct+'% OFF';if(res.inv){ptr.style.left='5%';ptr.style.background='#111';ptr.style.color='var(--muted)';}else{const pos=res.cor==='green'?85:res.cor==='orange'?50:15;ptr.style.left=pos+'%';ptr.style.background=cv;ptr.style.color=res.cor==='red'?'#fff':'#000';}}
+}
+
+function applyStatus(id,res){
+  const el=$(id);if(!el)return;
+  if(!res){el.textContent='AGUARDANDO VALOR';el.style.background='var(--surface2)';el.style.color='var(--muted)';return;}
+  if(res.inv){el.textContent='⚠ VALOR INVIÁVEL';el.style.background='var(--red-dim)';el.style.color='var(--red)';}
+  else if(res.cor==='green'){el.textContent='✅ MARGEM IDEAL';el.style.background='var(--green-dim)';el.style.color='var(--green)';}
+  else if(res.cor==='orange'){el.textContent='⚠ NEGOCIÁVEL';el.style.background='var(--orange-dim)';el.style.color='var(--orange)';}
+  else{el.textContent='🚨 CONSULTAR TEAM LEADER';el.style.background='var(--red-dim)';el.style.color='var(--red)';}
+}
+
+function fillLimits(invId,redId,negId,oraId,regra,nAulas,boxId){
+  const box=$(boxId);
+  if(!box)return;
+  if(!nAulas){box.style.display='none';return;}
+  box.style.display='';
+  const lim=CFG.LIM[regra];
+  const nivel=regra==='upgrade_premium'?'premium':regra==='individual'?'individual':'premium';
+  const ancla=CFG.ANCLA[nivel]*nAulas;
+  sid(invId,`de ${fmtBR(0)} a ${fmtBR(lim.inv*nAulas)}`);
+  sid(redId,`de ${fmtBR(lim.inv*nAulas)} a ${fmtBR(lim.red*nAulas)}`);
+  sid(negId,`de ${fmtBR(lim.red*nAulas)} a ${fmtBR(lim.ora*nAulas)}`);
+  sid(oraId,`de ${fmtBR(lim.ora*nAulas)} a ${fmtBR(ancla)}`);
+}
+
+function makeCuotasGrid(gridId,cb){
+  const grid=$(gridId);if(!grid||grid.children.length)return;
+  for(let i=1;i<=12;i++){
+    const b=document.createElement('button');b.className='cuota-btn'+(i===12?' active':'');
+    b.textContent=i+'x';b.dataset.v=i;
+    b.onclick=()=>{grid.querySelectorAll('.cuota-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');cb();};
+    grid.appendChild(b);
+  }
+}
+function getCuotas(gridId){return+$(gridId)?.querySelector('.cuota-btn.active')?.dataset.v||12;}
+
+/* ═══════════════════════════
+   COURSES
+═══════════════════════════ */
+const cardCursos={};
+function getC(id){return cardCursos[id]?[...cardCursos[id]]:[]; }
+function togC(id,c){
+  if(!cardCursos[id])cardCursos[id]=new Set();
+  cardCursos[id].has(c)?cardCursos[id].delete(c):cardCursos[id].add(c);
+  renderChips(id);refreshDD(id,c);
+}
+function initDD(id){
+  if(!cardCursos[id])cardCursos[id]=new Set();
+  const list=$(`crs-list-${id}`);if(!list)return;
+  list.innerHTML=CURSOS.map(c=>`<div class="dropdown-item${cardCursos[id].has(c)?' selected':''}" id="ddi-${id}-${c.replace(/\s/g,'_')}" onclick="togC('${id}','${c}')"><div class="dropdown-item-check"></div>${c}</div>`).join('');
+  renderChips(id);
+}
+function filterDD(id,q){const list=$(`crs-list-${id}`);if(!list)return;q=q.toLowerCase();list.querySelectorAll('.dropdown-item').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?'':'none');}
+function refreshDD(id,c){const el=$(`ddi-${id}-${c.replace(/\s/g,'_')}`);if(el)el.classList.toggle('selected',cardCursos[id].has(c));}
+function renderChips(id){
+  const cont=$(`selected-crs-${id}`);if(!cont)return;
+  const sel=cardCursos[id]?[...cardCursos[id]]:[];
+  cont.innerHTML=sel.map(s=>`<span class="selected-chip">${s}<button class="selected-chip-remove" onclick="togC('${id}','${s}')">×</button></span>`).join('');
+}
+function togDD(id,e){
+  e.stopPropagation();
+  const dd=$(`crs-dropdown-${id}`);if(!dd)return;
+  const was=dd.classList.contains('open');
+  document.querySelectorAll('.courses-dropdown.open').forEach(d=>d.classList.remove('open'));
+  if(!was){dd.classList.add('open');const s=$(`crs-search-${id}`);if(s){s.value='';filterDD(id,'');s.focus();}}
+}
+document.addEventListener('click',e=>{document.querySelectorAll('.courses-dropdown.open').forEach(dd=>{const sec=dd.closest('.courses-section');if(sec&&!sec.contains(e.target))dd.classList.remove('open');});});
+
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+let nivel='padron',cardSeq=0;
+const tabState={padron:null,premium:null,individual:null};
+
+function setNivel(n){
+  if(n===nivel)return;
+  if(!['upgrade','mixto'].includes(nivel))saveTabState(nivel);
+  nivel=n;
+  document.querySelectorAll('.level-tab').forEach(t=>{
+    const txt=t.textContent.toLowerCase();
+    t.classList.toggle('active',(n==='padron'&&txt.includes('pad'))||(n==='premium'&&txt.includes('prem')&&!txt.includes('up')&&!txt.includes('mix'))||(n==='individual'&&txt.includes('ind')&&!txt.includes('up')&&!txt.includes('mix'))||(n==='upgrade'&&txt.includes('upgrade'))||(n==='mixto'&&txt.includes('mixto')));
+  });
+  $('ws-normal').style.display=['upgrade','mixto'].includes(n)?'none':'';
+  $('ws-upgrade').style.display=n==='upgrade'?'':'none';
+  $('ws-mixto').style.display=n==='mixto'?'':'none';
+  if(!['upgrade','mixto'].includes(n))restoreTabState(n);
+  else if(n==='upgrade')initUpgradeTab();
+  else initMixtoTab();
+}
+
+function onNameChange(){const pane=$('pane-img');if(pane&&pane.classList.contains('active'))renderImg(collectCards());}
+
+/* ═══════════════════════════
+   NORMAL CARDS
+═══════════════════════════ */
+function addCard(){cardSeq++;buildCard(cardSeq);runCard(cardSeq);}
+
+function buildCard(id){
+  if(!cardCursos[id])cardCursos[id]=new Set();
+  const wrap=document.createElement('div');wrap.className='pkg-card';wrap.id=`card-${id}`;
+  wrap.innerHTML=`
+  <div style="position:relative;">
+    <div class="inviable-overlay" id="inv-m-${id}"><div class="inviable-label">⚠ INVIÁVEL</div><button class="inviable-refresh-btn" onclick="resetZ(${id},'m')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.01"/></svg>Refresh</button></div>
+    <div class="card-header"><span class="card-num">PKG #${String(id).padStart(2,'0')}</span><div style="display:flex;align-items:center;gap:6px;"><span class="real-badge" id="badge-${id}">MARGEM: --</span><button class="card-close" onclick="removeCard(${id})">×</button></div></div>
+    <div class="cuotas-section"><div class="section-label">Parcelas</div><div class="cuotas-grid" id="cuotas-${id}"></div></div>
+    <div class="card-body">
+      <div class="aulas-row">
+        <div class="aulas-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span id="aulas-num-${id}">-- aulas</span></div>
+        <div class="real-price-pill" id="rpp-${id}" style="display:none;"><span class="rp-label">Preço real</span><span id="rpv-${id}">--</span></div>
+      </div>
+
+      <!-- CALC MODE TOGGLE — NEW -->
+      <div style="margin-bottom:6px;">
+        <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Modo de cálculo</div>
+        <div class="calc-mode-toggle">
+          <button class="calc-mode-btn active" id="cm-val-${id}" onclick="setCalcMode(${id},'val')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Valor (R$)
+          </button>
+          <button class="calc-mode-btn" id="cm-pct-${id}" onclick="setCalcMode(${id},'pct')">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+            % Desconto
+          </button>
+        </div>
+      </div>
+
+      <!-- Computed value display (only visible in pct mode) -->
+      <div class="computed-val" id="computed-val-${id}" style="display:none;">
+        <span class="computed-val-label">💰 Valor calculado</span>
+        <span class="computed-val-num" id="computed-num-${id}">--</span>
+      </div>
+
+      <div class="input-row">
+        <div class="field"><label>Aulas</label><input type="number" id="cl-${id}" placeholder="Qtde" min="1"></div>
+        <div class="field"><label id="val-label-${id}">Valor Fechamento</label><input type="number" id="val-${id}" placeholder="R$ 0,00"></div>
+      </div>
+      <div class="iof-toggle"><button class="iof-btn active" id="iof-off-${id}" onclick="setIOF(${id},'m',false)">Sem IOF</button><button class="iof-btn" id="iof-on-${id}" onclick="setIOF(${id},'m',true)">Com IOF</button></div>
+      <div class="thermo-wrap"><div class="thermo-track"><div class="thermo-seg" id="ts-r-${id}" style="background:var(--red)"></div><div class="thermo-seg" id="ts-o-${id}" style="background:var(--orange)"></div><div class="thermo-seg" id="ts-g-${id}" style="background:var(--green)"></div></div><div class="thermo-ptr" id="ptr-${id}" style="left:50%">--%</div></div>
+      <div class="price-block">
+        <div class="price-installment" id="inst-${id}"></div>
+        <div class="price-main-row"><div class="price-total" id="total-${id}">R$ 0</div><span class="cashback-badge" id="cb-${id}"></span></div>
+        <div class="price-discount-row"><span class="price-off-badge" id="off-${id}" style="display:none">0% OFF</span><span class="price-economy" id="econ-${id}"></span></div>
+        <div class="price-link-box"><div class="price-link-label">Link Backoffice</div><div id="link-${id}">R$ 0,00</div></div>
+      </div>
+      <div class="status-bar" id="status-${id}">AGUARDANDO VALOR</div>
+      <div class="include-toggle" onclick="togInc(${id},'m')"><div class="toggle-track on" id="inc-m-${id}"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+      <div class="courses-section" id="crs-section-${id}">
+        <div class="courses-header"><span class="courses-label">Cursos incluídos</span><button class="courses-add-btn" onclick="togDD(${id},event)">+ Adicionar</button></div>
+        <div class="selected-courses" id="selected-crs-${id}"></div>
+        <div class="courses-dropdown" id="crs-dropdown-${id}"><div class="dropdown-search"><input type="text" placeholder="Buscar..." oninput="filterDD(${id},this.value)" id="crs-search-${id}"></div><div class="dropdown-list" id="crs-list-${id}"></div></div>
+      </div>
+    </div>
+  </div>
+  ${buildUpgHtml(id)}`;
+  $('cards-row').insertBefore(wrap,$('cards-row').lastElementChild);
+  makeCuotasGrid(`cuotas-${id}`,()=>runCard(id));
+  [`cl-${id}`,`val-${id}`].forEach(eid=>$(eid)?.addEventListener('input',()=>runCard(id)));
+  ['premium','individual'].forEach(t=>{$(`uval-${t}-${id}`)?.addEventListener('input',()=>runCard(id));});
+  initDD(id);
+}
+
+function buildUpgHtml(id){
+  if(nivel==='individual')return '';
+  const list=nivel==='padron'?[['premium','Migração → Premium'],['individual','Migração → Individual']]:[['individual','Migração → Individual']];
+  return list.map(([t,title])=>`
+  <div class="upgrade-section" id="usec-${t}-${id}">
+    <div style="position:relative;">
+      <div class="inviable-overlay" id="inv-${t}-${id}"><div class="inviable-label">⚠ INVIÁVEL</div><button class="inviable-refresh-btn" onclick="resetZ(${id},'${t}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.01"/></svg>Refresh</button></div>
+      <div class="upgrade-header"><span class="upgrade-title">${title}</span><div style="display:flex;align-items:center;gap:6px;"><span class="upg-real-pill" id="urpp-${t}-${id}" style="display:none;"><span class="rp-label">Preço real</span><span id="urpv-${t}-${id}">--</span></span><span class="factor-badge" id="fac-${t}-${id}">FATOR: --</span></div></div>
+      <div class="upgrade-input-row"><div class="field"><label>Valor</label><input type="number" id="uval-${t}-${id}" placeholder="R$ 0,00"></div><div class="iof-toggle"><button class="iof-btn active" id="iof-${t}-off-${id}" onclick="setIOF(${id},'${t}',false)">Sem</button><button class="iof-btn" id="iof-${t}-on-${id}" onclick="setIOF(${id},'${t}',true)">Com</button></div></div>
+      <div class="thermo-wrap"><div class="thermo-track"><div class="thermo-seg" id="ts-r-${t}-${id}" style="background:var(--red)"></div><div class="thermo-seg" id="ts-o-${t}-${id}" style="background:var(--orange)"></div><div class="thermo-seg" id="ts-g-${t}-${id}" style="background:var(--green)"></div></div><div class="thermo-ptr" id="ptr-${t}-${id}" style="left:50%">--%</div></div>
+      <div class="upg-price-block">
+        <div class="upg-price-installment" id="inst-${t}-${id}"></div>
+        <div class="upg-price-main-row"><div class="upg-price-total" id="total-${t}-${id}">R$ 0</div><span class="cashback-badge-sm" id="cb-${t}-${id}"></span></div>
+        <div class="upg-price-row"><span class="upg-off-badge" id="off-${t}-${id}" style="display:none">0% OFF</span><span class="upg-economy" id="econ-${t}-${id}"></span></div>
+        <div class="upg-link-box"><div class="price-link-label">Link Backoffice</div><div id="link-${t}-${id}">R$ 0,00</div></div>
+      </div>
+      <div class="status-bar" id="status-${t}-${id}">AGUARDANDO VALOR</div>
+      <div class="include-toggle" onclick="togInc(${id},'${t}')"><div class="toggle-track" id="inc-${t}-${id}"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+    </div>
+  </div>`).join('');
+}
+
+function removeCard(id){$(`card-${id}`)?.remove();delete cardCursos[id];delete cardCalcMode[id];}
+function resetZ(id,type){
+  if(type==='m'){const e=$(`val-${id}`);if(e)e.value='';setIOF(id,'m',false);}
+  else{const e=$(`uval-${type}-${id}`);if(e)e.value='';setIOF(id,type,false);}
+  runCard(id);showToast('🔄 Resetado');
+}
+function setIOF(id,type,val){
+  const p=type==='m'?'':type+'-';
+  $(`iof-${p}on-${id}`)?.classList.toggle('active',val);
+  $(`iof-${p}off-${id}`)?.classList.toggle('active',!val);
+  runCard(id);
+}
+function isIOF(id,type){const p=type==='m'?'':type+'-';return $(`iof-${p}on-${id}`)?.classList.contains('active')??false;}
+function togInc(id,type){$(`inc-${type}-${id}`)?.classList.toggle('on');}
+function isInc(id,type){return $(`inc-${type}-${id}`)?.classList.contains('on')??false;}
+
+function runCard(id){
+  const n=+$(`cl-${id}`)?.value||0;
+  const cuotas=getCuotas(`cuotas-${id}`), iof=isIOF(id,'m');
+  const mode=getCalcMode(id);
+
+  // Resolve final value to use for calculation
+  let v=0;
+  if(mode==='val'){
+    v=+$(`val-${id}`)?.value||0;
+  } else {
+    // pct mode
+    const pct=+$(`val-${id}`)?.value||0;
+    if(n>0&&pct>0){
+      const anclaForLevel=CFG.ANCLA[nivel]*n;
+      v=anclaForLevel*(1-pct/100);
+    }
+  }
+
+  // Update computed display
+  if(mode==='pct'){
+    updateComputedDisplay(id, v);
+  }
+
+  const anum=$(`aulas-num-${id}`);if(anum)anum.textContent=n>0?`${n} aulas`:'-- aulas';
+  const rpp=$(`rpp-${id}`),rpv=$(`rpv-${id}`);
+  if(rpp&&rpv){if(n>0){rpv.textContent=fmtBR(CFG.ANCLA[nivel]*n);rpp.style.display='inline-flex';}else rpp.style.display='none';}
+  const regP=nivel==='premium'?'premium_pure':nivel;
+  const res=calcPreco(v,iof,n,regP,nivel);
+  updateMain(id,res,cuotas);
+  const badge=$(`badge-${id}`);
+  if(res){const m=res.marg;badge.textContent=`MARGEM: ${m.toFixed(1)}%`;badge.style.background=m<=30?'var(--green-dim)':m<=40?'var(--orange-dim)':'var(--red-dim)';badge.style.color=m<=30?'var(--green)':m<=40?'var(--orange)':'var(--red)';badge.style.borderColor=m<=30?'rgba(34,197,94,.3)':m<=40?'rgba(245,158,11,.3)':'rgba(239,68,68,.3)';}
+  else{badge.textContent='MARGEM: --';badge.style.background='var(--surface3)';badge.style.color='var(--muted)';badge.style.borderColor='var(--border2)';}
+  const upgT=nivel==='padron'?['premium','individual']:nivel==='premium'?['individual']:[];
+  upgT.forEach(t=>{
+    const uv=+$(`uval-${t}-${id}`)?.value||0, uiof=isIOF(id,t);
+    const rU=t==='premium'?'upgrade_premium':t;
+    const rU2=calcPreco(uv,uiof,n,rU,t);
+    updateUpg(id,t,rU2,cuotas,res);
+    const up=$(`urpp-${t}-${id}`),uval=$(`urpv-${t}-${id}`);
+    if(up&&uval){if(n>0){uval.textContent=fmtBR(CFG.ANCLA[t]*n);up.style.display='inline-flex';}else up.style.display='none';}
+  });
+}
+
+function updateMain(id,res,cuotas){
+  const inv=$(`inv-m-${id}`);
+  if(!res){
+    [$(`ts-r-${id}`),$(`ts-o-${id}`),$(`ts-g-${id}`)].forEach(s=>s?.classList.remove('on'));
+    const ptr=$(`ptr-${id}`);if(ptr){ptr.style.left='50%';ptr.textContent='--%';ptr.style.background='var(--surface3)';ptr.style.color='var(--muted)';}
+    applyStatus(`status-${id}`,null);if(inv)inv.classList.remove('show');
+    sid(`inst-${id}`,'');sid(`total-${id}`,'R$ 0');sid(`link-${id}`,'R$ 0,00');
+    const off=$(`off-${id}`);if(off)off.style.display='none';sid(`econ-${id}`,'');setCB(`cb-${id}`,0);return;
+  }
+  applyThermo(`ptr-${id}`,`ts-r-${id}`,`ts-o-${id}`,`ts-g-${id}`,res);
+  applyStatus(`status-${id}`,res);
+  if(inv)inv.classList.toggle('show',res.inv);
+  sid(`inst-${id}`,`${cuotas}x de R$ ${fmtDec(res.vc/cuotas)}`);
+  sid(`total-${id}`,`R$ ${fmtN(res.vc)}`);
+  sid(`link-${id}`,`R$ ${fmtDec(res.link)}`);
+  const pct=Math.round(res.desc),off=$(`off-${id}`);
+  if(off&&pct>0){off.style.display='inline-flex';off.textContent=`${pct}% OFF`;}else if(off)off.style.display='none';
+  sid(`econ-${id}`,res.econ>0?`Economia R$ ${res.econ.toLocaleString('pt-BR')}`:'');
+  setCB(`cb-${id}`,res.vc);
+}
+
+function updateUpg(id,t,res,cuotas,resMain){
+  const inv=$(`inv-${t}-${id}`);
+  if(!res){
+    [$(`ts-r-${t}-${id}`),$(`ts-o-${t}-${id}`),$(`ts-g-${t}-${id}`)].forEach(s=>s?.classList.remove('on'));
+    const ptr=$(`ptr-${t}-${id}`);if(ptr){ptr.style.left='50%';ptr.textContent='--%';ptr.style.background='var(--surface3)';ptr.style.color='var(--muted)';}
+    applyStatus(`status-${t}-${id}`,null);if(inv)inv.classList.remove('show');
+    sid(`inst-${t}-${id}`,'');sid(`total-${t}-${id}`,'R$ 0');sid(`link-${t}-${id}`,'R$ 0,00');
+    const off=$(`off-${t}-${id}`);if(off)off.style.display='none';sid(`econ-${t}-${id}`,'');sid(`fac-${t}-${id}`,'FATOR: --');
+    setCB(`cb-${t}-${id}`,0);return;
+  }
+  applyThermo(`ptr-${t}-${id}`,`ts-r-${t}-${id}`,`ts-o-${t}-${id}`,`ts-g-${t}-${id}`,res);
+  applyStatus(`status-${t}-${id}`,res);
+  if(inv)inv.classList.toggle('show',res.inv);
+  sid(`inst-${t}-${id}`,`${cuotas}x de R$ ${fmtDec(res.vc/cuotas)}`);
+  sid(`total-${t}-${id}`,`R$ ${fmtN(res.vc)}`);
+  sid(`link-${t}-${id}`,`R$ ${fmtDec(res.link)}`);
+  const pct=Math.round(res.desc),off=$(`off-${t}-${id}`);
+  if(off&&pct>0){off.style.display='inline-flex';off.textContent=`${pct}% OFF`;}else if(off)off.style.display='none';
+  sid(`econ-${t}-${id}`,res.econ>0?`Economia R$ ${res.econ.toLocaleString('pt-BR')}`:'');
+  if(resMain)sid(`fac-${t}-${id}`,`FATOR: ${resMain.vl>0?(res.vl/resMain.vl).toFixed(2):'--'}`);
+  setCB(`cb-${t}-${id}`,res.vc);
+}
+
+/* ═══════════════════════════
+   TAB STATE
+═══════════════════════════ */
+function saveTabState(n){
+  const cards=[];
+  document.querySelectorAll('.pkg-card').forEach(el=>{
+    const id=el.id.replace('card-','');
+    const cuotaEl=$(`cuotas-${id}`)?.querySelector('.cuota-btn.active');
+    const variants={};['premium','individual'].forEach(t=>{const e=$(`uval-${t}-${id}`);if(e)variants[t]={val:e.value,iof:isIOF(id,t),inc:isInc(id,t)};});
+    cards.push({id,cl:$(`cl-${id}`)?.value||'',val:$(`val-${id}`)?.value||'',iof:isIOF(id,'m'),cuota:cuotaEl?+cuotaEl.dataset.v:12,incM:isInc(id,'m'),calcMode:getCalcMode(id),variants,cursos:getC(id)});
+  });
+  tabState[n]={cards,seq:cardSeq};
+}
+function restoreTabState(n){
+  const state=tabState[n];
+  const row=$('cards-row');row.innerHTML='<div class="add-card" onclick="addCard()" title="Novo pacote">+</div>';
+  if(!state||!state.cards.length){cardSeq=0;addCard();return;}
+  cardSeq=state.seq;
+  state.cards.forEach(c=>{
+    buildCard(+c.id);
+    const cl=$(`cl-${c.id}`),vl=$(`val-${c.id}`);if(cl)cl.value=c.cl;if(vl)vl.value=c.val;
+    if(c.iof)setIOF(c.id,'m',true);
+    if(c.calcMode&&c.calcMode!=='val')setCalcMode(c.id,c.calcMode);
+    const grid=$(`cuotas-${c.id}`);if(grid)grid.querySelectorAll('.cuota-btn').forEach(b=>b.classList.toggle('active',+b.dataset.v===c.cuota));
+    const tm=$(`inc-m-${c.id}`);if(tm){tm.classList.remove('on');if(c.incM)tm.classList.add('on');}
+    Object.entries(c.variants||{}).forEach(([t,vd])=>{const e=$(`uval-${t}-${c.id}`);if(e)e.value=vd.val;if(vd.iof)setIOF(c.id,t,true);const tr=$(`inc-${t}-${c.id}`);if(tr){tr.classList.remove('on');if(vd.inc)tr.classList.add('on');}});
+    cardCursos[c.id]=new Set(c.cursos||[]);initDD(+c.id);renderChips(+c.id);runCard(+c.id);
+  });
+}
+
+/* ═══════════════════════════
+   UPGRADE TAB
+═══════════════════════════ */
+function initUpgradeTab(){
+  makeCuotasGrid('upg-cuotas',calcUpgrade);
+  calcUpgrade();
+}
+function setUpgIOF(t,v){$(`upg-iof-${t}-on`)?.classList.toggle('active',v);$(`upg-iof-${t}-off`)?.classList.toggle('active',!v);calcUpgrade();}
+function isUpgIOF(t){return $(`upg-iof-${t}-on`)?.classList.contains('active')??false;}
+function togUpgInc(t){$(`upg-inc-${t}`)?.classList.toggle('on');}
+function isUpgInc(t){return $(`upg-inc-${t}`)?.classList.contains('on')??false;}
+
+function calcUpgrade(){
+  const orig=+$('upg-orig')?.value||0, pago=+$('upg-pago')?.value||0, rest=+$('upg-rest')?.value||0;
+  const cuotas=getCuotas('upg-cuotas');
+  const rpa=orig>0?pago/orig:0, saldo=rpa*rest;
+  sid('upg-rpa',rpa>0?'R$ '+rpa.toFixed(2):'--');
+  sid('upg-saldo',saldo>0?fmtBR(saldo,2):'R$ --');
+  sid('upg-rest-disp',rest>0?rest:'--');
+  sid('upg-anc-prem',rest>0?fmtBR(CFG.ANCLA.premium*rest):'--');
+  sid('upg-anc-ind',rest>0?fmtBR(CFG.ANCLA.individual*rest):'--');
+  fillLimits('upg-li-prem','upg-lr-prem','upg-ln-prem','upg-lo-prem','upgrade_premium',rest,'upg-lbox-prem');
+  fillLimits('upg-li-ind','upg-lr-ind','upg-ln-ind','upg-lo-ind','individual',rest,'upg-lbox-ind');
+  calcUpgCol('prem','upgrade_premium','premium',rest,saldo,cuotas);
+  calcUpgCol('ind','individual','individual',rest,saldo,cuotas);
+}
+
+function showUpgInv(colEl,show,resetFn){
+  if(!colEl)return;
+  let ov=colEl.querySelector('.upg-inv-overlay');
+  if(!ov){
+    ov=document.createElement('div');ov.className='upg-inv-overlay';
+    ov.innerHTML=`<div class="inviable-label">⚠ VALOR INVIÁVEL</div><button class="inviable-refresh-btn" onclick="this.closest('.upg-inv-overlay').classList.remove('show');${resetFn}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.01"/></svg>Refresh</button>`;
+    colEl.style.position='relative';colEl.appendChild(ov);
+  }
+  ov.classList.toggle('show',show);
+}
+
+function calcUpgCol(t,regra,nivel,rest,saldo,cuotas){
+  const vd=+$(`upg-val-${t}`)?.value||0, iof=isUpgIOF(t);
+  const ancla=CFG.ANCLA[nivel]*rest;
+  const colEl=$(`upg-col-${t}`);
+  const reset=()=>{
+    applyThermo(`upg-ptr-${t}`,`upg-tr-${t}`,`upg-to-${t}`,`upg-tg-${t}`,null);
+    applyStatus(`upg-status-${t}`,null);
+    ['upg-tot-','upg-saldo-','upg-diff-','upg-parc-','upg-link-'].forEach(p=>sid(p+t,'--'));
+    showUpgInv(colEl,false,'');
+  };
+  if(!vd||!rest){reset();return;}
+  let vc,vl;
+  if(iof){vc=vd;vl=vd/CFG.IOF;}else{vl=vd;vc=vd*CFG.IOF;}
+  const diff=Math.max(0,vc-saldo), liqNet=Math.max(0,vl-saldo);
+  const lim=CFG.LIM[regra], lpa=vl/rest;
+  const inv=lpa<lim.inv, cor=lpa>=lim.ora?'green':lpa>=lim.red?'orange':'red';
+  const desc=ancla>0?Math.round((1-vc/ancla)*100):0;
+  const res={vc,vl,desc,cor,inv,ancla};
+  applyThermo(`upg-ptr-${t}`,`upg-tr-${t}`,`upg-to-${t}`,`upg-tg-${t}`,res);
+  applyStatus(`upg-status-${t}`,res);
+  showUpgInv(colEl,inv,`document.getElementById('upg-val-${t}').value='';calcUpgrade()`);
+  sid(`upg-tot-${t}`,'R$ '+fmtN(vc));
+  sid(`upg-saldo-${t}`,fmtBR(saldo));
+  sid(`upg-diff-${t}`,'R$ '+fmtN(diff));
+  sid(`upg-parc-${t}`,diff>0?`${cuotas}x de R$ ${fmtDec(diff/cuotas)}`:'');
+  sid(`upg-link-${t}`,'R$ '+fmtDec(liqNet));
+}
+
+/* ═══════════════════════════
+   MIXTO TAB
+═══════════════════════════ */
+const mixPkgs={prem:[],ind:[]};
+let mixPkgSeq=0;
+
+function initMixtoTab(){
+  makeCuotasGrid('mix-cuotas-upg-prem',calcMixto);
+  makeCuotasGrid('mix-cuotas-upg-ind',calcMixto);
+  calcMixto();
+}
+
+function setMixUpgIOF(col,val){
+  $(`mix-iof-upg-${col}-on`)?.classList.toggle('active',val);
+  $(`mix-iof-upg-${col}-off`)?.classList.toggle('active',!val);
+  calcMixto();
+}
+function isMixUpgIOF(col){return $(`mix-iof-upg-${col}-on`)?.classList.contains('active')??false;}
+function togMixUpgInc(col){$(`mix-upg-inc-${col}`)?.classList.toggle('on');}
+function isMixUpgInc(col){return $(`mix-upg-inc-${col}`)?.classList.contains('on')??false;}
+
+function addMixPkg(col){
+  mixPkgSeq++;
+  const id=`mpk-${col}-${mixPkgSeq}`;
+  const num=mixPkgs[col].length+1;
+  mixPkgs[col].push({id,col,num,cursos:new Set()});
+  cardCursos[id]=mixPkgs[col][mixPkgs[col].length-1].cursos;
+  const container=$(`mix-pkgs-${col}`);
+  const div=document.createElement('div');
+  div.className='mix-new-pkg';div.id=`mix-pkg-${id}`;
+  const colLabel=col==='prem'?'Premium':'Individual';
+  const PKG_NAMES_MIX=['Diferencial','Profissional','Completo','Plus','Máximo'];
+  const pkgDisplayName=PKG_NAMES_MIX[Math.min(num-1,PKG_NAMES_MIX.length-1)];
+  div.innerHTML=`
+    <button class="mix-new-pkg-remove" onclick="removeMixPkg('${col}','${id}')">×</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <div class="mix-new-pkg-num">${num}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--violet);">Migração ${colLabel} ${pkgDisplayName}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div class="field"><label>Aulas novas</label><input type="number" id="mpk-aulas-${id}" placeholder="Ex: 40" oninput="calcMixto()"></div>
+      <div class="field"><label>Valor (R$)</label><input type="number" id="mpk-val-${id}" placeholder="R$ 0,00" oninput="calcMixto()"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:3px;">Parcelas</label>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;" id="mpk-cuotas-${id}"></div>
+      </div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:4px;">IOF</label>
+        <div class="iof-toggle" style="margin-bottom:0;"><button class="iof-btn active" id="mpk-iof-off-${id}" onclick="setMixPkgIOF('${id}',false)">Sem</button><button class="iof-btn" id="mpk-iof-on-${id}" onclick="setMixPkgIOF('${id}',true)">Com</button></div>
+      </div>
+    </div>
+    <div class="limits-box" id="mpk-lbox-${id}">
+      <div class="limits-box-title">Guia de valores — upgrade ${colLabel}</div>
+      <div class="lim-row" style="background:var(--red-dim);border:1px solid var(--red);"><span class="lim-tag" style="color:var(--red);">🔴 INVIÁVEL</span><span class="lim-val" style="color:var(--red);" id="mpk-li-${id}">--</span></div>
+      <div class="lim-row" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.4);"><span class="lim-tag" style="color:var(--red);">🔴 CONSULTAR</span><span class="lim-val" style="color:var(--red);" id="mpk-lr-${id}">--</span></div>
+      <div class="lim-row" style="background:var(--orange-dim);border:1px solid var(--orange);"><span class="lim-tag" style="color:var(--orange);">🟡 NEGOC.</span><span class="lim-val" style="color:var(--orange);" id="mpk-ln-${id}">--</span></div>
+      <div class="lim-row" style="background:var(--green-dim);border:1px solid var(--green);"><span class="lim-tag" style="color:var(--green);">🟢 IDEAL</span><span class="lim-val" style="color:var(--green);" id="mpk-lo-${id}">--</span></div>
+    </div>
+    <div class="thermo-wrap"><div class="thermo-track"><div class="thermo-seg" id="mpk-tr-${id}" style="background:var(--red)"></div><div class="thermo-seg" id="mpk-to-${id}" style="background:var(--orange)"></div><div class="thermo-seg" id="mpk-tg-${id}" style="background:var(--green)"></div></div><div class="thermo-ptr" id="mpk-ptr-${id}" style="left:50%">--%</div></div>
+    <div style="text-align:center;margin-bottom:4px;">
+      <div style="font-size:10px;color:var(--sky);font-weight:600;" id="mpk-inst-${id}"></div>
+      <div style="font-size:22px;font-weight:800;" id="mpk-total-${id}">R$ 0</div>
+      <span class="cashback-badge" id="mpk-cb-${id}"></span>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;" id="mpk-off-${id}"></div>
+      <div class="price-link-box" style="margin-top:6px;"><div class="price-link-label">Link Backoffice</div><div id="mpk-link-${id}">R$ 0,00</div></div>
+    </div>
+    <div class="acum-box" id="mpk-acum-${id}">
+      <div class="acum-box-title">📊 Resumo desta opção</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;color:var(--muted2);">Preço real novos níveis</span><span style="font-size:11px;font-weight:600;color:var(--muted2);" id="mpk-acum-real-${id}">--</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;color:var(--muted2);">Total novos níveis</span><span style="font-size:12px;font-weight:700;color:var(--violet);" id="mpk-acum-pkgs-${id}">--</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:10px;color:var(--muted2);">Diferença pendente</span><span style="font-size:11px;font-weight:600;color:var(--sky);" id="mpk-acum-diff-${id}">--</span></div>
+      <div style="border-top:1px solid rgba(168,85,247,.2);padding-top:6px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;font-weight:700;">TOTAL a pagar</span><span style="font-size:20px;font-weight:800;color:var(--violet);" id="mpk-acum-total-${id}">--</span></div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:3px;" id="mpk-acum-parc-${id}"></div>
+      <div style="text-align:center;font-size:10px;color:var(--green);font-weight:600;margin-top:3px;" id="mpk-acum-desc-${id}"></div>
+      <span class="cashback-badge" id="mpk-acum-cb-${id}" style="width:100%;justify-content:center;margin-top:6px;"></span>
+    </div>
+    <div class="status-bar" id="mpk-status-${id}" style="margin-top:6px;">AGUARDANDO</div>
+    <div class="include-toggle" onclick="togMixPkgInc('${id}')"><div class="toggle-track on" id="mpk-inc-${id}"><div class="toggle-thumb"></div></div><span class="toggle-label">Incluir na oferta</span></div>
+    <div class="courses-section" id="crs-section-${id}" style="margin-top:8px;">
+      <div class="courses-header"><span class="courses-label">Cursos</span><button class="courses-add-btn" onclick="togDD('${id}',event)">+ Adicionar</button></div>
+      <div class="selected-courses" id="selected-crs-${id}"></div>
+      <div class="courses-dropdown" id="crs-dropdown-${id}"><div class="dropdown-search"><input type="text" placeholder="Buscar..." oninput="filterDD('${id}',this.value)" id="crs-search-${id}"></div><div class="dropdown-list" id="crs-list-${id}"></div></div>
+    </div>`;
+  container.appendChild(div);
+  makeCuotasGrid(`mpk-cuotas-${id}`,calcMixto);
+  initDD(id);
+  calcMixto();
+}
+
+function removeMixPkg(col,id){
+  $(`mix-pkg-${id}`)?.remove();
+  mixPkgs[col]=mixPkgs[col].filter(p=>p.id!==id);
+  delete cardCursos[id];
+  mixPkgs[col].forEach((p,i)=>{
+    const numEl=$(`mix-pkg-${p.id}`)?.querySelector('.mix-new-pkg-num');
+    if(numEl)numEl.textContent=i+1;
+  });
+  calcMixto();
+}
+
+function setMixPkgIOF(id,val){$(`mpk-iof-on-${id}`)?.classList.toggle('active',val);$(`mpk-iof-off-${id}`)?.classList.toggle('active',!val);calcMixto();}
+function isMixPkgIOF(id){return $(`mpk-iof-on-${id}`)?.classList.contains('active')??false;}
+function togMixPkgInc(id){$(`mpk-inc-${id}`)?.classList.toggle('on');}
+function isMixPkgInc(id){return $(`mpk-inc-${id}`)?.classList.contains('on')??false;}
+
+function calcMixto(){
+  const orig=+$('mix-orig')?.value||0, pago=+$('mix-pago')?.value||0, rest=+$('mix-rest')?.value||0;
+  const rpa=orig>0?pago/orig:0, saldo=rpa*rest;
+  sid('mix-rpa',rpa>0?'R$ '+rpa.toFixed(2):'--');
+  sid('mix-saldo',saldo>0?fmtBR(saldo,2):'R$ --');
+  sid('mix-rest-disp',rest>0?rest:'--');
+  sid('mix-anc-prem',rest>0?fmtBR(CFG.ANCLA.premium*rest):'--');
+  sid('mix-anc-ind',rest>0?fmtBR(CFG.ANCLA.individual*rest):'--');
+  fillLimits('mix-li-upg-prem','mix-lr-upg-prem','mix-ln-upg-prem','mix-lo-upg-prem','upgrade_premium',rest,'mix-lbox-upg-prem');
+  fillLimits('mix-li-upg-ind','mix-lr-upg-ind','mix-ln-upg-ind','mix-lo-upg-ind','individual',rest,'mix-lbox-upg-ind');
+  const diffPrem=calcMixUpgCol('prem','upgrade_premium','premium',rest,saldo);
+  const diffInd=calcMixUpgCol('ind','individual','individual',rest,saldo);
+  calcMixColPkgs('prem','upgrade_premium','premium',diffPrem);
+  calcMixColPkgs('ind','individual','individual',diffInd);
+}
+
+function calcMixUpgCol(col,regra,nivel,rest,saldo){
+  const vd=+$(`mix-val-upg-${col}`)?.value||0, iof=isMixUpgIOF(col);
+  const cuotas=getCuotas(`mix-cuotas-upg-${col}`);
+  const ancla=CFG.ANCLA[nivel]*rest;
+  const colEl=$(`mix-col-${col}`);
+  if(!vd||!rest){
+    applyThermo(`mix-ptr-upg-${col}`,`mix-tr-upg-${col}`,`mix-to-upg-${col}`,`mix-tg-upg-${col}`,null);
+    applyStatus(`mix-status-upg-${col}`,null);
+    sid(`mix-diff-${col}`,'--');sid(`mix-parc-upg-${col}`,'');
+    showUpgInv(colEl,false,'');
+    return null;
+  }
+  let vc,vl;if(iof){vc=vd;vl=vd/CFG.IOF;}else{vl=vd;vc=vd*CFG.IOF;}
+  const diff=Math.max(0,vc-saldo);
+  const lim=CFG.LIM[regra],lpa=vl/rest;
+  const inv=lpa<lim.inv,cor=lpa>=lim.ora?'green':lpa>=lim.red?'orange':'red';
+  const desc=ancla>0?Math.round((1-vc/ancla)*100):0;
+  const res={vc,vl,desc,cor,inv,ancla};
+  applyThermo(`mix-ptr-upg-${col}`,`mix-tr-upg-${col}`,`mix-to-upg-${col}`,`mix-tg-upg-${col}`,res);
+  applyStatus(`mix-status-upg-${col}`,res);
+  showUpgInv(colEl,inv,`document.getElementById('mix-val-upg-${col}').value='';calcMixto()`);
+  sid(`mix-diff-${col}`,'R$ '+fmtN(diff));
+  sid(`mix-parc-upg-${col}`,diff>0?`${cuotas}x de R$ ${fmtDec(diff/cuotas)}`:'');
+  return diff;
+}
+
+function calcMixColPkgs(col,regra,nivel,diffVal){
+  mixPkgs[col].forEach((pkg,idx)=>{
+    const id=pkg.id;
+    const aulas=+$(`mpk-aulas-${id}`)?.value||0;
+    const vd=+$(`mpk-val-${id}`)?.value||0;
+    const iof=isMixPkgIOF(id);
+    const cuotas=getCuotas(`mpk-cuotas-${id}`);
+    const pkgCardEl=$(`mix-pkg-${id}`);
+    fillLimits(`mpk-li-${id}`,`mpk-lr-${id}`,`mpk-ln-${id}`,`mpk-lo-${id}`,regra,aulas,`mpk-lbox-${id}`);
+    const res=calcPreco(vd,iof,aulas,regra,nivel);
+    applyThermo(`mpk-ptr-${id}`,`mpk-tr-${id}`,`mpk-to-${id}`,`mpk-tg-${id}`,res);
+    applyStatus(`mpk-status-${id}`,res);
+    showUpgInv(pkgCardEl,res?res.inv:false,`document.getElementById('mpk-val-${id}').value='';calcMixto()`);
+    const anclaThisPkg=aulas>0?CFG.ANCLA[nivel]*aulas:0;
+    if(!res){
+      sid(`mpk-inst-${id}`,'');sid(`mpk-total-${id}`,'R$ 0');sid(`mpk-link-${id}`,'R$ 0,00');
+      sid(`mpk-off-${id}`,'');setCB(`mpk-cb-${id}`,0);
+      sid(`mpk-acum-real-${id}`,anclaThisPkg>0?fmtBR(anclaThisPkg):'--');
+      sid(`mpk-acum-pkgs-${id}`,'--');
+      sid(`mpk-acum-diff-${id}`,diffVal!==null?'R$ '+fmtN(diffVal):'--');
+      sid(`mpk-acum-total-${id}`,'--');
+      sid(`mpk-acum-parc-${id}`,'');sid(`mpk-acum-desc-${id}`,'');
+      setCB(`mpk-acum-cb-${id}`,0);
+      return;
+    }
+    sid(`mpk-inst-${id}`,`${cuotas}x de R$ ${fmtDec(res.vc/cuotas)}`);
+    sid(`mpk-total-${id}`,`R$ ${fmtN(res.vc)}`);
+    sid(`mpk-link-${id}`,'R$ '+fmtDec(res.link));
+    const pct=Math.round(res.desc);
+    sid(`mpk-off-${id}`,pct>0?`${pct}% OFF · Economia R$ ${fmtN(res.econ)}`:'');
+    setCB(`mpk-cb-${id}`,res.vc);
+    const acumTotal=diffVal!==null?res.vc+diffVal:res.vc;
+    const anclaUpgRest=+$('mix-rest')?.value*CFG.ANCLA[nivel]||0;
+    const totalAnclaWithUpg=anclaThisPkg+(anclaUpgRest||0);
+    const descTotal=totalAnclaWithUpg>0?Math.round((1-acumTotal/totalAnclaWithUpg)*100):0;
+    sid(`mpk-acum-real-${id}`,anclaThisPkg>0?fmtBR(anclaThisPkg):'--');
+    sid(`mpk-acum-pkgs-${id}`,'R$ '+fmtN(res.vc));
+    sid(`mpk-acum-diff-${id}`,diffVal!==null?'R$ '+fmtN(diffVal):'--');
+    sid(`mpk-acum-total-${id}`,'R$ '+fmtN(acumTotal));
+    sid(`mpk-acum-parc-${id}`,`${cuotas}x de R$ ${fmtDec(acumTotal/cuotas)}`);
+    sid(`mpk-acum-desc-${id}`,descTotal>0?`${descTotal}% de desconto sobre preço real`:'');
+    setCB(`mpk-acum-cb-${id}`,res.vc);
+  });
+}
+
+/* ═══════════════════════════
+   COLLECT FOR MODAL
+═══════════════════════════ */
+function collectCards(){
+  if(nivel==='upgrade')return collectUpgrade();
+  if(nivel==='mixto')return collectMixto();
+  return collectNormal();
+}
+
+function collectNormal(){
+  const raw=[];
+  document.querySelectorAll('.pkg-card').forEach(el=>{
+    const id=el.id.replace('card-','');
+    const n=+$(`cl-${id}`)?.value||0;
+    const mode=getCalcMode(id);
+    let v=0;
+    if(mode==='val'){v=+$(`val-${id}`)?.value||0;}
+    else{const pct=+$(`val-${id}`)?.value||0;if(n>0&&pct>0){const ancla=CFG.ANCLA[nivel]*n;v=ancla*(1-pct/100);}}
+    if(!v&&!n)return;
+    const cuotas=getCuotas(`cuotas-${id}`);
+    raw.push({id,n,cuotas,v});
+  });
+  const sorted=[...raw].sort((a,b)=>b.n-a.n);
+  const rankMap={};sorted.forEach((r,i)=>rankMap[r.id]=i);
+  const NAMES=['Profissional','Avançado','Essencial','Inicial','Básico'];
+  return raw.map(r=>{
+    const {id,n,cuotas,v}=r;
+    const iof=isIOF(id,'m'),regP=nivel==='premium'?'premium_pure':nivel;
+    const res=calcPreco(v,iof,n,regP,nivel);
+    const cursos=getC(id);
+    const pkg={id,n,cuotas,name:NAMES[Math.min(rankMap[id],4)],variants:[],upgrades:[],cursos,mode:'normal'};
+    if(res)pkg.variants.push({type:'main',label:nivel==='padron'?'Padrão':nivel==='premium'?'Premium':'Individual',res,iof,n,cuotas,inc:isInc(id,'m'),cursos});
+    const upgT=nivel==='padron'?['premium','individual']:nivel==='premium'?['individual']:[];
+    upgT.forEach(t=>{
+      const e=$(`uval-${t}-${id}`);if(!e)return;
+      const uv=+e.value||0;if(!uv)return;
+      const uiof=isIOF(id,t),rU=t==='premium'?'upgrade_premium':t;
+      const rU2=calcPreco(uv,uiof,n,rU,t);if(!rU2)return;
+      const obj={type:t,label:t==='premium'?'Migração Premium':'Migração Individual',res:rU2,iof:uiof,n,cuotas,inc:isInc(id,t),cursos};
+      pkg.variants.push(obj);pkg.upgrades.push(obj);
+    });
+    return pkg.variants.length?pkg:null;
+  }).filter(Boolean);
+}
+
+function collectUpgrade(){
+  const orig=+$('upg-orig')?.value||0, pago=+$('upg-pago')?.value||0, rest=+$('upg-rest')?.value||0;
+  const cuotas=getCuotas('upg-cuotas');
+  const rpa=orig>0?pago/orig:0, saldo=rpa*rest;
+  const result=[];
+  [['prem','upgrade_premium','premium'],['ind','individual','individual']].forEach(([t,regra,nivel])=>{
+    const vd=+$(`upg-val-${t}`)?.value||0;if(!vd||!rest)return;
+    const iof=isUpgIOF(t);
+    let vc,vl;if(iof){vc=vd;vl=vd/CFG.IOF;}else{vl=vd;vc=vd*CFG.IOF;}
+    const diff=Math.max(0,vc-saldo), liqNet=Math.max(0,vl-saldo);
+    const ancla=CFG.ANCLA[nivel]*rest;
+    const desc=ancla>0?(1-vc/ancla)*100:0, econ=Math.round(ancla-vc);
+    const lim=CFG.LIM[regra],lpa=vl/rest,inv=lpa<lim.inv,cor=lpa>=lim.ora?'green':lpa>=lim.red?'orange':'red';
+    const res={vc,vl,link:liqNet,ancla,desc,econ,cor,inv};
+    result.push({id:`upg-${t}`,n:rest,cuotas,name:t==='prem'?'Migração Premium':'Migração Individual',
+      variants:[{type:'main',label:t==='prem'?'↑ Premium':'↑ Individual',res,iof,n:rest,cuotas,inc:isUpgInc(t),cursos:[],
+        extra:{saldo,diff,precoReal:ancla}}],
+      upgrades:[],cursos:[],mode:'upgrade',saldo,diff});
+  });
+  return result;
+}
+
+function collectMixto(){
+  const orig=+$('mix-orig')?.value||0, pago=+$('mix-pago')?.value||0, rest=+$('mix-rest')?.value||0;
+  const rpa=orig>0?pago/orig:0, saldo=rpa*rest;
+  const result=[];
+  [['prem','upgrade_premium','premium'],['ind','individual','individual']].forEach(([col,regra,nivel])=>{
+    const vd=+$(`mix-val-upg-${col}`)?.value||0;
+    const cuotasUpg=getCuotas(`mix-cuotas-upg-${col}`);
+    let diffVal=null;
+    if(vd&&rest){
+      const iof=isMixUpgIOF(col);
+      let vc,vl;if(iof){vc=vd;vl=vd/CFG.IOF;}else{vl=vd;vc=vd*CFG.IOF;}
+      diffVal=Math.max(0,vc-saldo);
+      const ancla=CFG.ANCLA[nivel]*rest;
+      const desc=ancla>0?(1-vc/ancla)*100:0,econ=Math.round(ancla-vc);
+      const lim=CFG.LIM[regra],lpa=vl/rest,inv=lpa<lim.inv,cor=lpa>=lim.ora?'green':lpa>=lim.red?'orange':'red';
+      const res={vc,vl,link:Math.max(0,vl-saldo),ancla,desc,econ,cor,inv};
+      if(isMixUpgInc(col)){
+        result.push({id:`mix-upg-${col}`,n:rest,cuotas:cuotasUpg,
+          name:col==='prem'?'Diferença Premium':'Diferença Individual',
+          variants:[{type:'main',label:col==='prem'?'Diferença ↑ Premium':'Diferença ↑ Individual',res,iof,n:rest,cuotas:cuotasUpg,inc:true,cursos:[],
+            extra:{saldo,diff:diffVal,precoReal:ancla,isDiff:true}}],
+          upgrades:[],cursos:[],mode:'mixto-upg',saldo,diff:diffVal});
+      }
+    }
+    const PKG_NAMES_MIX=['Diferencial','Profissional','Completo','Plus','Máximo'];
+    mixPkgs[col].forEach((pkg,idx)=>{
+      const id=pkg.id;
+      if(!isMixPkgInc(id))return;
+      const aulas=+$(`mpk-aulas-${id}`)?.value||0;
+      const vd2=+$(`mpk-val-${id}`)?.value||0;
+      if(!aulas&&!vd2)return;
+      const iof2=isMixPkgIOF(id);
+      const cuotas2=getCuotas(`mpk-cuotas-${id}`);
+      const res2=calcPreco(vd2,iof2,aulas,regra,nivel);
+      if(!res2)return;
+      const acumTotal=diffVal!==null?res2.vc+diffVal:res2.vc;
+      const anclaThisPkg=CFG.ANCLA[nivel]*aulas;
+      const anclaUpgRest=rest>0?CFG.ANCLA[nivel]*rest:0;
+      const cursos=getC(id);
+      const pkgDisplayName=PKG_NAMES_MIX[Math.min(idx,PKG_NAMES_MIX.length-1)];
+      const colName=col==='prem'?'Premium':'Individual';
+      result.push({id:`mix-pkg-${id}`,n:aulas,cuotas:cuotas2,
+        name:`Migração ${colName} ${pkgDisplayName}`,
+        variants:[{type:'main',label:`Migração ${colName} ${pkgDisplayName}`,res:res2,iof:iof2,n:aulas,cuotas:cuotas2,inc:true,cursos,
+          extra:{isDiff:false,acumTotal,diffVal,cuotasAcum:cuotas2,precoRealNovos:anclaThisPkg,anclaUpgRest,saldoDisp:saldo}}],
+        upgrades:[],cursos,mode:'mixto-pkg',acumTotal,diffVal,cuotas:cuotas2});
+    });
+  });
+  return result;
+}
+
+/* ═══════════════════════════
+   MODAL
+═══════════════════════════ */
+function openModal(){
+  const cards=collectCards();
+  renderOfferList(cards);renderWA(cards);renderImg(cards);
+  $('modal-overlay').classList.add('open');
+}
+function closeModal(){$('modal-overlay').classList.remove('open');}
+function closeOnOverlay(e){if(e.target.id==='modal-overlay')closeModal();}
+
+function renderOfferList(cards){
+  const list=$('offer-pkg-list');
+  if(!cards.length){list.innerHTML='<div style="color:var(--muted);font-size:12px;padding:20px 0;">Nenhum pacote com valores.</div>';return;}
+  list.innerHTML=cards.map((pkg,pi)=>`
+    <div class="offer-pkg">
+      <div class="offer-pkg-title"><div class="offer-pkg-num">${pi+1}</div>${pkg.name} — ${pkg.n} aulas / ${pkg.cuotas}x</div>
+      ${pkg.variants.map(v=>`
+        <div class="offer-item" onclick="togOfferItem('${pkg.id}','${v.type}','${pkg.mode}')">
+          <div class="offer-item-left"><div class="offer-checkbox ${v.inc?'checked':''}" id="och-${pkg.id}-${v.type}"></div>
+            <div><div class="offer-item-name">${v.label}</div><div class="offer-item-type">${v.iof?'COM IOF':'SEM IOF'} · ${v.n} aulas · ${Math.round(v.res.desc)}% OFF</div></div>
+          </div>
+          <div class="offer-item-price">R$ ${fmtN(v.res.vc)}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function togOfferItem(pkgId,type,mode){
+  if(mode==='upgrade'){const t=pkgId.replace('upg-','');togUpgInc(t);}
+  else if(mode==='mixto-upg'){const c=pkgId.replace('mix-upg-','');togMixUpgInc(c);}
+  else if(mode==='mixto-pkg'){const id=pkgId.replace('mix-pkg-','');togMixPkgInc(id);}
+  else{togInc(pkgId,type);}
+  $(`och-${pkgId}-${type}`)?.classList.toggle('checked');
+  const cards=collectCards();renderWA(cards);renderImg(cards);
+}
+
+/* ═══════════════════════════
+   WA PREVIEW
+═══════════════════════════ */
+function renderWA(cards){
+  const wa=$('wa-text');
+  const sel=[];cards.forEach(pkg=>pkg.variants.forEach(v=>{if(v.inc)sel.push({pkg,v});}));
+  if(!sel.length){wa.textContent='Selecione pelo menos uma variante...';return;}
+  const isUpgMode=cards.some(c=>c.mode==='upgrade'||c.mode==='mixto-upg'||c.mode==='mixto-pkg');
+  let msg=isUpgMode?'⬆️ *PROPOSTA ESPECIAL*\n':'🎯 *OPÇÕES DE CONTINUIDADE*\n';
+  msg+='━━━━━━━━━━━━━━━━━━\n\n';
+  sel.forEach(({pkg,v},i)=>{
+    const cursos=v.cursos||[];
+    msg+=`📦 *Opção ${i+1} — ${pkg.name}*\n`;
+    if(cursos.length)msg+=`📚 ${cursos.join(' • ')}\n`;
+    const ex=v.extra;
+    if(ex&&ex.isDiff){
+      msg+=`\n✅ *${v.label}*\n`;
+      msg+=`💡 Preço real: R$ ${fmtN(ex.precoReal)}\n`;
+      msg+=`💰 Saldo disponível: R$ ${fmtN(ex.saldo)}\n`;
+      msg+=`📅 Diferença: R$ ${fmtN(ex.diff)} · ${v.cuotas}x de R$ ${fmtDec(ex.diff/v.cuotas)}\n`;
+      msg+=`🏷️ ${Math.round(v.res.desc)}% de desconto sobre preço real\n`;
+    } else if(ex&&!ex.isDiff&&ex.acumTotal!==undefined){
+      msg+=`\n✅ *${v.label}*\n`;
+      if(ex.precoRealNovos)msg+=`📋 Preço real novos níveis: R$ ${fmtN(ex.precoRealNovos)}\n`;
+      msg+=`📚 Total novos níveis: R$ ${fmtN(v.res.vc)}\n`;
+      if(ex.diffVal!==null)msg+=`➕ Diferença pendente: R$ ${fmtN(ex.diffVal)}\n`;
+      msg+=`💰 *Total a pagar: R$ ${fmtN(ex.acumTotal)}*\n`;
+      msg+=`📅 ${v.cuotas}x de R$ ${fmtDec(ex.acumTotal/v.cuotas)}\n`;
+      const cb=calcCashback(v.res.vc);if(cb>0)msg+=`💸 Cashback: R$ ${fmtDec(cb)}\n`;
+    } else {
+      msg+=`\n✅ *${v.label}*\n`;
+      msg+=`💰 R$ ${fmtN(v.res.vc)}${v.iof?' (inclui IOF)':''}\n`;
+      msg+=`📅 ${v.cuotas}x de R$ ${fmtDec(v.res.vc/v.cuotas)}\n`;
+      msg+=`🏷️ ${Math.round(v.res.desc)}% de desconto\n`;
+    }
+    msg+='\n';
+  });
+  msg+='━━━━━━━━━━━━━━━━━━\n💬 Qual opção faz mais sentido pra você?\n👇 Me fala e a gente acerta agora!';
+  wa.textContent=msg;
+}
+
+/* ═══════════════════════════
+   IMAGE RENDER
+═══════════════════════════ */
+function getFI(t){if(t<=1)return new Set([0]);if(t===2)return new Set([]);if(t===3)return new Set([1]);return new Set([1,2]);}
+
+function renderImg(cards){
+  const display=cards.filter(p=>p.variants.some(v=>v.type==='main'&&v.inc));
+  const canvas=$('offer-canvas');const ctx=canvas.getContext('2d');const DPR=2;const N=display.length||0;
+  if(!N){
+    canvas.width=400*DPR;canvas.height=200*DPR;canvas.style.width='400px';canvas.style.height='200px';
+    ctx.scale(DPR,DPR);ctx.fillStyle='#c8e85a';ctx.fillRect(0,0,400,200);
+    ctx.fillStyle='#3d5210';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Nenhum pacote selecionado',200,100);return;
+  }
+  const COLS=Math.min(N,4),CW=N<=2?300:N===3?270:238;
+  const PH=24,PT=20,HH=90,FH=40,R=22;
+  const fi=getFI(N);
+  const UPG_SLOT=72;
+  function upgC(p){return(p.upgrades||[]).filter(u=>u.inc).length;}
+  const maxU=Math.max(0,...display.map(p=>upgC(p)));
+  function cRC(p){const c=(p.cursos||[]).length;return c===0?0:Math.min(Math.ceil(c/2),3);}
+  const maxCR=Math.max(0,...display.map(p=>cRC(p)));
+  const BASE_H=380,CH=BASE_H+(maxU*UPG_SLOT)+(maxU>0?12:0)+(maxCR*28)+(maxCR>0?10:0);
+  const FL=N>=3?20:0;
+  const WR=PH*2+COLS*CW,W=Math.max(WR,620),H=PT+HH+20+FL+CH+PT+FH;
+  canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(DPR,DPR);
+  ctx.fillStyle='#c8e85a';ctx.fillRect(0,0,W,H);
+  const OX=Math.floor((W-WR)/2);
+  ctx.fillStyle='rgba(255,255,255,.82)';rr(ctx,PH,PT,W-PH*2,HH,20);ctx.fill();
+  const sn=($('student-name')?.value||'').trim();
+  ctx.fillStyle='#4a8fe8';ctx.font=`800 24px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('KODLAND',PH+18,PT+HH/2);
+  const lw=ctx.measureText('KODLAND').width+PH+18+16,aw=W-lw-PH;
+  const isMixU=display.some(d=>d.mode==='mixto-upg'||d.mode==='mixto-pkg'||d.mode==='upgrade');
+  let ct=isMixU?(sn?`Proposta especial para ${sn}`:'Proposta especial de migração'):(sn?`Pacote especial para ${sn}`:'Selecione o pacote ideal para você');
+  ctx.fillStyle='#111827';let fs=20;ctx.font=`700 ${fs}px 'Plus Jakarta Sans',sans-serif`;
+  while(ctx.measureText(ct).width>aw&&fs>13){fs--;ctx.font=`700 ${fs}px 'Plus Jakarta Sans',sans-serif`;}
+  ctx.textAlign='center';ctx.fillText(ct,lw+aw/2,PT+HH/2);
+  const BY=PT+HH+20+FL;
+  const order=[...Array(N).keys()].sort((a,b)=>{const fa=fi.has(a),fb=fi.has(b);return fa===fb?0:fa?1:-1;});
+  order.forEach(idx=>{
+    const pkg=display[idx],mv=pkg.variants.find(v=>v.type==='main');
+    const iF=fi.has(idx),x=PH+idx*CW+OX,y=iF?BY-FL:BY,cH=iF?CH+FL:CH;
+    drawCard(ctx,x,y,CW,cH,pkg,mv,iF,idx,N,R,maxU,maxCR);
+  });
+  const vi=$('validity-date')?.value||'';
+  let vt=vi?`Pacotes válidos até ${vi.split('-').reverse().join('/')}`:'Kodland';
+  ctx.font=`700 14px 'Plus Jakarta Sans',sans-serif`;
+  const ICON='⚠️ ',tw=ctx.measureText(vt).width,iw=vi?ctx.measureText(ICON).width:0;
+  const PW=tw+iw+56,PHH=36,PR2=18,PX=W/2-PW/2,PY=H-PHH-7;
+  ctx.save();ctx.fillStyle='rgba(0,0,0,.08)';rr(ctx,PX,PY+2,PW,PHH,PR2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.strokeStyle=vi?'#f59e0b':'#d1d5db';ctx.lineWidth=2;rr(ctx,PX,PY,PW,PHH,PR2);ctx.fill();ctx.stroke();ctx.restore();
+  const CY=PY+PHH/2;
+  if(vi){const sx=W/2-(iw+tw)/2;ctx.font=`700 14px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle='#f59e0b';ctx.fillText(ICON,sx,CY);ctx.fillStyle='#92400e';ctx.fillText(vt,sx+iw,CY);}
+  else{ctx.font=`700 14px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#6b7280';ctx.fillText(vt,W/2,CY);}
+}
+
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function drawCard(ctx,x,y,w,h,pkg,mv,iF,idx,N,R,maxU,maxCR){
+  const BG=iF?'#4a8fe8':'#fff',TS=iF?'rgba(255,255,255,.78)':'#4b5563';
+  const AC=iF?'#fff':'#4a8fe8',NC=iF?'#fff':'#0f172a';
+  const PB=iF?'rgba(255,255,255,.22)':'#eff6ff',PT2=iF?'#fff':'#1e40af';
+  const BB=iF?'#fff':'#4a8fe8',BT=iF?'#4a8fe8':'#fff';
+  const DIV=iF?'rgba(255,255,255,.2)':'#e5e7eb';
+  const UB=iF?'rgba(56,189,248,.18)':'#f0f9ff',UD=iF?'rgba(56,189,248,.5)':'#bae6fd',UT=iF?'#e0f2fe':'#0c4a6e';
+  const CB2=iF?'rgba(255,255,255,.2)':'rgba(56,189,248,.12)',CD=iF?'rgba(255,255,255,.4)':'rgba(56,189,248,.35)',CT=iF?'#fff':'#0369a1';
+  if(iF){ctx.save();ctx.shadowColor='rgba(74,143,232,.35)';ctx.shadowBlur=22;ctx.shadowOffsetY=8;}
+  rr(ctx,x,y,w,h,R);ctx.fillStyle=BG;ctx.fill();
+  if(iF)ctx.restore();
+  if(!iF){ctx.save();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1.5;rr(ctx,x,y,w,h,R);ctx.stroke();ctx.restore();}
+
+  const isUpgMode=pkg.mode==='upgrade'||pkg.mode==='mixto-upg';
+  const isMixPkg=pkg.mode==='mixto-pkg';
+  const disc=Math.round(mv.res.desc);
+  if(disc>0){
+    const bW=52,bH=22,bX=x+w-bW-10,bY=y-11;
+    ctx.fillStyle=isUpgMode?'#0ea5e9':'#ec4899';rr(ctx,bX,bY,bW,bH,11);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font=`700 12px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`-${disc}%`,bX+bW/2,bY+bH/2);
+  }
+  const BTH=56,EH=22,PB2=16;
+  const VU=(pkg.upgrades||[]).filter(u=>u.inc);
+  const UT2=maxU*72+(maxU>0?14:0);
+  const cursos=pkg.cursos||[];const PR=26,PGV=6,PGH=6,PPR=2;
+  const cRows=cursos.length>0?Math.ceil(cursos.length/PPR):0;
+  const CTR=maxCR>0?(maxCR*PR+(maxCR-1)*PGV+16):0;
+  const EY=y+h-PB2,BnY=EY-EH-BTH-2,DY=BnY-UT2-14;
+  const cEY=DY-12,cSY=cEY-CTR,uSY=DY+12;
+  const TP=26,tS=y+TP,tE=cSY-8,tSp=tE-tS;
+  const APH=26,NH=iF?32:28,ParH=20,DsH=36;
+  const gap=Math.max(8,Math.floor((tSp-(APH+NH+ParH+DsH))/3));
+  let cy=tS;
+
+  const pillLabel=isUpgMode?`${pkg.n} aulas restantes`:`${pkg.n} aulas`;
+  const plW=Math.min(w-40,isUpgMode?130:96);
+  ctx.fillStyle=isUpgMode?'rgba(56,189,248,.22)':PB;ctx.strokeStyle=isUpgMode?'rgba(56,189,248,.5)':'transparent';ctx.lineWidth=1;
+  rr(ctx,x+20,cy,plW,APH,13);ctx.fill();if(isUpgMode)ctx.stroke();
+  ctx.fillStyle=isUpgMode?'#38bdf8':PT2;ctx.font=`600 11px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(pillLabel,x+28,cy+APH/2);
+  cy+=APH+gap;
+
+  ctx.fillStyle=NC;ctx.textBaseline='alphabetic';ctx.textAlign='left';
+  let nameFontSize=iF?24:21;
+  ctx.font=`700 ${nameFontSize}px 'Plus Jakarta Sans',sans-serif`;
+  while(ctx.measureText(pkg.name).width>w-40&&nameFontSize>13){nameFontSize--;ctx.font=`700 ${nameFontSize}px 'Plus Jakarta Sans',sans-serif`;}
+  ctx.fillText(pkg.name,x+20,cy+NH-4);cy+=NH+gap;
+
+  const ex=mv.extra;
+  let showVal=mv.res.vc,showCuotas=pkg.cuotas;
+  if(ex&&ex.isDiff){showVal=ex.diff;showCuotas=mv.cuotas;}
+  else if(ex&&ex.acumTotal!==undefined){showVal=ex.acumTotal;showCuotas=mv.cuotas;}
+  const pp=fmtDec(showVal/showCuotas);
+  ctx.fillStyle=AC;ctx.font=`600 14px 'Plus Jakarta Sans',sans-serif`;ctx.textBaseline='alphabetic';ctx.fillText(`${showCuotas}x R$ ${pp}`,x+20,cy+ParH-4);cy+=ParH+gap;
+
+  const desc2=isUpgMode?DESCS_UPG[idx%DESCS_UPG.length]:isMixPkg?DESCS_UPG[(idx+1)%DESCS_UPG.length]:DESCS[idx%DESCS.length];
+  ctx.fillStyle=TS;ctx.font=`400 11px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';wrapTxt(ctx,desc2,x+w/2,cy+12,w-40,17);
+
+  if(cursos.length>0){
+    const pW=Math.floor((w-40-PGH)/PPR);
+    for(let ri=0;ri<cRows;ri++){
+      const rc=cursos.slice(ri*PPR,(ri+1)*PPR);
+      rc.forEach((c,ci)=>{
+        const px=x+20+ci*(pW+PGH),py=cSY+ri*(PR+PGV);
+        ctx.fillStyle=CB2;ctx.strokeStyle=CD;ctx.lineWidth=1;rr(ctx,px,py,pW,PR,13);ctx.fill();ctx.stroke();
+        ctx.fillStyle=CT;ctx.font=`600 10px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+        let label='+ '+c;while(ctx.measureText(label).width>pW-16&&label.length>3)label=label.slice(0,-1);if(label!=='+ '+c)label=label.trim()+'…';
+        ctx.fillText(label,px+pW/2,py+PR/2);
+      });
+    }
+  }
+
+  ctx.strokeStyle=DIV;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+20,DY);ctx.lineTo(x+w-20,DY);ctx.stroke();
+
+  VU.forEach((upg,ui)=>{
+    const ux=x+14,uw=w-28,uh=66,uy=uSY+ui*72;
+    ctx.fillStyle=UB;ctx.strokeStyle=UD;ctx.lineWidth=1;rr(ctx,ux,uy,uw,uh,14);ctx.fill();ctx.stroke();
+    ctx.fillStyle=UT;
+    ctx.font=`600 9px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(upg.type==='premium'?'▲ MIGRAÇÃO PREMIUM':'▲ MIGRAÇÃO INDIVIDUAL',ux+12,uy+16);
+    const up2=fmtDec(upg.res.vc/upg.cuotas);
+    ctx.font=`600 10px 'Plus Jakarta Sans',sans-serif`;ctx.fillStyle=iF?'rgba(224,242,254,.9)':'#0369a1';ctx.fillText(`${upg.cuotas}x de R$ ${up2}`,ux+12,uy+30);
+    ctx.font=`700 15px 'Plus Jakarta Sans',sans-serif`;ctx.fillStyle=UT;ctx.fillText(`R$ ${fmtN(upg.res.vc)}`,ux+12,uy+48);
+    const at=`R$ ${fmtN(upg.res.ancla)}`;ctx.font=`400 10px 'Plus Jakarta Sans',sans-serif`;ctx.fillStyle=iF?'rgba(224,242,254,.55)':'#94a3b8';
+    const aw2=ctx.measureText(at).width;ctx.fillText(at,ux+uw-aw2-12,uy+48);
+    ctx.strokeStyle=iF?'rgba(224,242,254,.45)':'#94a3b8';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(ux+uw-aw2-12,uy+43);ctx.lineTo(ux+uw-12,uy+43);ctx.stroke();
+    const ud=Math.round(upg.res.desc);
+    if(ud>0){const dW=40,dH=16,dX=ux+uw-aw2-dW-18,dY=uy+33;ctx.fillStyle='#0ea5e9';rr(ctx,dX,dY,dW,dH,8);ctx.fill();ctx.fillStyle='#fff';ctx.font=`700 9px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`-${ud}%`,dX+dW/2,dY+dH/2);}
+    ctx.textBaseline='alphabetic';
+  });
+
+  ctx.fillStyle=BB;rr(ctx,x+14,BnY,w-28,BTH,16);ctx.fill();
+  ctx.fillStyle=BT;let bfs=iF?21:18;ctx.font=`700 ${bfs}px 'Plus Jakarta Sans',sans-serif`;
+  let btnTxt;
+  if(ex&&ex.isDiff)btnTxt=`R$ ${fmtN(ex.diff)}`;
+  else if(ex&&ex.acumTotal!==undefined)btnTxt=`R$ ${fmtN(ex.acumTotal)}`;
+  else btnTxt=`R$ ${fmtN(mv.res.vc)}`;
+  while(ctx.measureText(btnTxt).width>w-40&&bfs>12){bfs--;ctx.font=`700 ${bfs}px 'Plus Jakarta Sans',sans-serif`;}
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(btnTxt,x+w/2,BnY+BTH/2);
+
+  ctx.fillStyle=TS;ctx.font=`400 10px 'Plus Jakarta Sans',sans-serif`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  if(ex&&ex.isDiff){
+    ctx.fillText(`Preço real: R$ ${fmtN(ex.precoReal)}`,x+w/2,EY-12);
+    ctx.fillText(`Saldo disponível: R$ ${fmtN(ex.saldo)}`,x+w/2,EY);
+  } else if(ex&&ex.acumTotal!==undefined){
+    const precoRealTotal=(ex.precoRealNovos||0)+(ex.diffVal!==null?(ex.anclaUpgRest||0):0);
+    if(precoRealTotal>0){
+      ctx.fillText(`Preço real: R$ ${fmtN(precoRealTotal)}`,x+w/2,EY-12);
+      if(ex.diffVal!==null) ctx.fillText(`Saldo disponível: R$ ${fmtN(ex.saldoDisp||0)}`,x+w/2,EY);
+    } else if(mv.res.econ>0){
+      ctx.fillText(`Economia R$ ${mv.res.econ.toLocaleString('pt-BR')}`,x+w/2,EY);
+    }
+  } else if(mv.res.econ>0){
+    ctx.fillText(`Economia R$ ${mv.res.econ.toLocaleString('pt-BR')}`,x+w/2,EY);
+  }
+}
+
+const DESCS=[
+  'O pacote completo para quem quer ir além dos limites e chegar ao topo.',
+  'A escolha certa para evoluir com ritmo, consistência e resultado real.',
+  'Ideal para quem quer aprender fazendo e construir o futuro com as próprias mãos.',
+  'O primeiro passo de uma jornada que vai muito além do esperado.',
+  'Uma oportunidade única de continuar crescendo com o melhor suporte.',
+];
+const DESCS_UPG=[
+  'Aproveite seu saldo e migre para um nível superior com condições exclusivas.',
+  'Sua jornada continua — e agora com ainda mais recursos e possibilidades.',
+  'A decisão certa para quem já começou e quer chegar muito mais longe.',
+  'Migração especial: maximize o que você já investiu e alcance novos resultados.',
+];
+function wrapTxt(ctx,text,x,y,mw,lh){if(!text)return;const w2=text.split(' ');let ln='',ly=y;for(let i=0;i<w2.length;i++){const t=ln+w2[i]+' ';if(ctx.measureText(t).width>mw&&i>0){ctx.fillText(ln.trim(),x,ly);ln=w2[i]+' ';ly+=lh;}else ln=t;}ctx.fillText(ln.trim(),x,ly);}
+
+/* ═══════════════════════════
+   MISC
+═══════════════════════════ */
+function switchPreview(tab){
+  document.querySelectorAll('.preview-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase().includes(tab==='wa'?'what':'imag')));
+  $('pane-wa').classList.toggle('active',tab==='wa');$('pane-img').classList.toggle('active',tab==='img');
+  if(tab==='img')renderImg(collectCards());
+}
+function copyWA(){navigator.clipboard.writeText($('wa-text').textContent).then(()=>showToast('✅ Mensagem copiada!')).catch(()=>showToast('Erro'));}
+function downloadImg(){const a=document.createElement('a');a.download='proposta-ism.png';a.href=$('offer-canvas').toDataURL('image/png');a.click();showToast('✅ Imagem baixada!');}
+function showToast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function confirmNova(){$('confirm-overlay').classList.add('open');}
+function closeConfirm(){$('confirm-overlay').classList.remove('open');}
+function execNova(){
+  closeConfirm();tabState.padron=null;tabState.premium=null;tabState.individual=null;
+  cardSeq=0;Object.keys(cardCursos).forEach(k=>delete cardCursos[k]);
+  Object.keys(cardCalcMode).forEach(k=>delete cardCalcMode[k]);
+  mixPkgSeq=0;mixPkgs.prem=[];mixPkgs.ind=[];
+  $('mix-pkgs-prem').innerHTML='';$('mix-pkgs-ind').innerHTML='';
+  $('cards-row').innerHTML='<div class="add-card" onclick="addCard()" title="Novo pacote">+</div>';
+  addCard();showToast('✅ Nova proposta!');
+}
+
+addCard();
+</script>
+</body>
+</html>

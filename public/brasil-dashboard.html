@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0d0f12; --card: #161b22; --border: rgba(255,255,255,0.1);
+      --accent: #3b82f6; --top: #00ff88; --high: #fbbf24; --norm: #f97316; --out: #ef4444;
+      --text-main: #ffffff; --text-dim: #8b949e;
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; margin: 0; -webkit-font-smoothing: antialiased; }
+    .main-container { max-width: 1600px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+
+    /* period selector */
+    .month-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+    .month-bar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+    .month-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: var(--text-dim); font-size: 12px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; gap: 6px; }
+    .month-btn:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+    .month-btn.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.5); color: #3b82f6; font-weight: 600; }
+    .month-btn.live-btn { border-color: rgba(0,255,136,0.25); color: #00cc77; }
+    .month-btn.live-btn:hover { border-color: rgba(0,255,136,0.5); color: #00ff88; }
+    .month-btn.live-btn.active { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.45); color: #00ff88; }
+    .month-badge { font-size: 9px; background: rgba(0,255,136,0.15); color: var(--top); border-radius: 4px; padding: 1px 5px; font-weight: 700; letter-spacing: 0.04em; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: livepulse 1.4s ease-in-out infinite; }
+    .live-dot-g { width: 7px; height: 7px; border-radius: 50%; background: #00ff88; flex-shrink: 0; animation: livepulse-g 1.4s ease-in-out infinite; }
+    @keyframes livepulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)} 50%{box-shadow:0 0 0 5px rgba(239,68,68,0)} }
+    @keyframes livepulse-g { 0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,0.5)} 50%{box-shadow:0 0 0 5px rgba(0,255,136,0)} }
+
+    /* live top header */
+    .live-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 14px; }
+    /* live header only */
+
+    /* manager compact rows */
+    .mgr-target-list { display: flex; flex-direction: column; gap: 5px; }
+    .mgr-compact-row { display: grid; grid-template-columns: 18px 145px 1fr 210px 120px; align-items: center; gap: 8px; padding: 9px 12px; background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; transition: background 0.15s, border-color 0.15s; font-size: 12px; }
+    .mgr-compact-row:hover { background: rgba(255,255,255,0.025); border-color: rgba(255,255,255,0.1); }
+
+    /* main dashboard */
+    .lbl-header { font-size: 14px; text-transform: uppercase; color: var(--text-dim); font-weight: 500; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+    .val-huge { font-size: 42px; font-weight: 600; color: #fff; letter-spacing: -0.02em; }
+    .val-sub { font-size: 16px; font-weight: 500; color: var(--high); opacity: 0.9; }
+    .top-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; }
+    .rev-row-align { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px 20px; }
+    .text-block-fixed { flex-grow: 1; text-align: left; }
+    .donut-wrapper { position: relative; width: 130px !important; height: 130px !important; flex-shrink: 0; margin-left: 20px; }
+    .donut-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 600; }
+    .aux-sidebar { display: flex; flex-direction: column; gap: 12px; width: 300px; padding-left: 10px; justify-content: space-between; }
+    .aux-item { background: rgba(255,255,255,0.02); padding: 18px; border-radius: 12px; display: flex; align-items: center; gap: 20px; flex-grow: 1; border: 1px solid rgba(255,255,255,0.03); }
+    .aux-item i { font-size: 20px; color: var(--text-dim); width: 30px; text-align: center; opacity: 0.7; }
+    .aux-item .val { font-size: 28px; font-weight: 600; color: #fff; }
+    .term-wrapper { position: relative; margin: 60px auto 50px auto; width: 90%; }
+    .term-bar { background: #2a2f35; height: 28px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
+    .term-fill { height: 100%; transition: width 1s ease; border-radius: 20px; }
+    .line-white { position: absolute; top: -12px; height: 52px; width: 3px; background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); z-index: 10; }
+    #v-cap { position: absolute; top: -42px; background: #fff; color: #000; padding: 4px 12px; border-radius: 4px; font-weight: 600; font-size: 12px; transform: translateX(-50%); white-space: nowrap; }
+    #v-diff { position: absolute; bottom: -38px; font-weight: 600; transform: translateX(-50%); font-size: 20px; }
+    .pipe-row { display: flex; justify-content: space-between; padding: 14px 18px; border-radius: 10px; margin-bottom: 8px; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
+    .pipe-label { font-size: 15px; font-weight: 500; text-transform: uppercase; color: var(--text-dim); }
+    .pipe-val { font-size: 18px; font-weight: 600; }
+    .diff-small { font-size: 14px; font-weight: 500; margin-left: 8px; }
+    .task-item { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; border-left: 3px solid; font-weight: 400; color: rgba(255,255,255,0.85); }
+    .perf-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+    .perf-box { text-align: center; padding: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .perf-box span { font-weight: 500 !important; letter-spacing: 0.05em; }
+    .donut-perf { width: 100px !important; height: 100px !important; }
+    .mgr-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+    .mgr-row { background: rgba(255,255,255,0.015); transition: background 0.3s; }
+    .mgr-row:hover { background: rgba(255,255,255,0.04); }
+    .mgr-table th { font-weight: 500; letter-spacing: 0.05em; padding-bottom: 10px; }
+    .mgr-table td { font-weight: 400; font-size: 14px; }
+    .pill { display: inline-block; width: 140px; padding: 6px 0; border-radius: 6px; font-weight: 600; font-size: 10px; text-transform: uppercase; text-align: center; color: #000; }
+
+    /* live 3-card grid */
+    .live-cards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .live-card-donut-center { display: flex; flex-direction: column; align-items: center; padding: 20px 0 6px; }
+    .donut-text { z-index: 2; }
+
+    @keyframes liveBorderPulse {
+      0%, 100% { border-color: rgba(59,130,246,0.18); box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+      50%       { border-color: rgba(59,130,246,0.55); box-shadow: 0 0 22px rgba(59,130,246,0.1); }
+    }
+    .live-card-pulse { animation: liveBorderPulse 2.8s ease-in-out infinite; }
+
+    /* live value indicators */
+    @keyframes arrowRise { 0%{opacity:0;transform:translateY(5px)} 35%{opacity:1} 100%{opacity:0;transform:translateY(-16px)} }
+    .lv-arrow { display:inline-block; color:#00ff88; font-size:13px; font-weight:900; line-height:1; animation:arrowRise 1.3s ease-out infinite; margin-left:1px; }
+    @keyframes lvSpin { to{transform:rotate(360deg)} }
+    .lv-loader { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,0.12); border-top-color:rgba(255,255,255,0.45); border-radius:50%; animation:lvSpin 0.85s linear infinite; vertical-align:middle; margin-left:7px; }
+    .lv-ind { display:inline-flex; align-items:center; margin-left:6px; vertical-align:baseline; }
+
+    /* comet left badge */
+    .comet-badge { min-height:26px; font-size:11px; font-weight:700; color:#00ff88; text-align:center; letter-spacing:0.04em; opacity:0; transition:opacity 0.4s; margin-top:6px; }
+
+    #loading { display:none; position:fixed; inset:0; background:rgba(13,15,18,0.7); z-index:100; align-items:center; justify-content:center; }
+    #loading.show { display:flex; }
+    .spinner { width:36px; height:36px; border:3px solid rgba(59,130,246,0.2); border-top-color:#3b82f6; border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div></div>
+
+<div class="main-container">
+
+  <!-- ── PERIOD SELECTOR ── -->
+  <div class="month-bar">
+    <span class="month-bar-label">Period</span>
+    <div id="month-tabs" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    <div id="refresh-counter" style="margin-left:auto; font-size:11px; color:var(--text-dim); display:none;">
+      Refresh in <span id="refresh-secs" style="color:#00cc77; font-weight:700;">5:00</span>
+    </div>
+  </div>
+
+  <!-- ── LIVE SECTION ── -->
+  <div id="live-section" style="display:none; flex-direction:column; gap:16px;">
+    <div class="live-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="live-dot-g"></div>
+        <span style="font-weight:700; font-size:13px; color:#00ff88; letter-spacing:0.05em;">LIVE — Current Month</span>
+      </div>
+      <span id="live-updated" style="font-size:11px; color:var(--text-dim);">Loading...</span>
+    </div>
+
+    <!-- 3 equal cards -->
+    <div class="live-cards-grid">
+
+      <!-- Card 1: Revenue vs Target -->
+      <div class="card live-card-pulse" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <span class="lbl-header" style="color:var(--accent); opacity:0.8; letter-spacing:0.08em;">Total Revenue vs Target</span>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+            <div class="val-huge" id="lv-rev" style="color:#fff;">$0</div>
+            <span id="lv-rev-ind" class="lv-ind"></span>
+            <div style="font-size:13px; color:rgba(255,255,255,0.25); margin-left:2px;">of</div>
+            <div class="val-huge" id="lv-tar" style="color:rgba(255,255,255,0.32); font-size:28px;">$0</div>
+          </div>
+        </div>
+        <div class="live-card-donut-center">
+          <div class="donut-wrapper" id="lv-rev-donut-wrap" style="width:190px !important; height:190px !important;">
+            <canvas id="lv-rev-donut"></canvas>
+            <div class="donut-text" id="lv-rev-p" style="color:var(--accent); font-size:24px; font-weight:700;">0%</div>
+          </div>
+          <div id="lv-rev-badge" class="comet-badge"></div>
+        </div>
+      </div>
+
+      <!-- Card 2: Today's Goal -->
+      <div class="card live-card-pulse" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <span class="lbl-header" style="color:var(--accent); opacity:0.8; letter-spacing:0.08em;">Today's Goal</span>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+            <div class="val-huge" id="lv-today" style="color:#fff;">$0</div>
+            <span id="lv-today-ind" class="lv-ind"></span>
+            <div style="font-size:13px; color:rgba(255,255,255,0.25); margin-left:2px;">of</div>
+            <div class="val-huge" id="lv-daily-goal" style="color:rgba(255,255,255,0.32); font-size:28px;">$0</div>
+          </div>
+          <div id="lv-daily-extra" style="font-size:12px; margin-top:4px; color:var(--text-dim);"></div>
+        </div>
+        <div class="live-card-donut-center">
+          <div class="donut-wrapper" id="lv-daily-donut-wrap" style="width:190px !important; height:190px !important;">
+            <canvas id="lv-daily-donut"></canvas>
+            <div class="donut-text" id="lv-daily-pct" style="color:var(--accent); font-size:24px; font-weight:700;">0%</div>
+          </div>
+          <div id="lv-daily-badge" class="comet-badge"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Prediction -->
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <span class="lbl-header">Prediction</span>
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <div class="val-huge" id="lv-p-tot" style="color:var(--accent);">$0</div>
+            <span id="lv-p-diff" class="diff-small"></span>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="pipe-row" style="border-left:4px solid var(--accent); background:rgba(59,130,246,0.03)"><span class="pipe-label">Waiting for Decision</span><span id="lv-p-wait" class="pipe-val"></span></div>
+          <div class="pipe-row" style="border-left:4px solid var(--high); background:rgba(251,191,36,0.03)"><span class="pipe-label">Negotiation</span><span id="lv-p-neg" class="pipe-val"></span></div>
+          <div class="pipe-row" style="border-left:4px solid var(--top); background:rgba(0,255,136,0.03)"><span class="pipe-label">Payment Control</span><span id="lv-p-pay" class="pipe-val"></span></div>
+        </div>
+        <div id="lv-rem-box" style="margin-top:16px; padding:18px; border:1px solid rgba(59,130,246,0.3); border-radius:12px; background:rgba(59,130,246,0.03); display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <span class="pipe-label" id="lv-rem-lbl" style="color:var(--accent); font-size:14px;">Left to Target</span>
+            <div id="lv-rem" style="font-size:32px; font-weight:600; color:var(--accent);">$0</div>
+          </div>
+          <div class="donut-wrapper" style="width:80px !important; height:80px !important;">
+            <canvas id="lv-gap-chart"></canvas>
+            <div class="donut-text" id="lv-rem-p" style="font-size:14px; color:var(--accent);">0%</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end live-cards-grid -->
+  </div>
+
+  <!-- ── MONTHLY DASHBOARD ── -->
+  <div id="monthly-dashboard" style="display:flex; flex-direction:column; gap:20px;">
+    <div class="top-grid">
+      <div class="card" style="display:flex; gap:15px; padding:15px;">
+        <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:space-between;">
+          <div class="rev-row-align">
+            <div class="text-block-fixed">
+              <span class="lbl-header">Total Revenue vs Target</span>
+              <div class="val-huge" id="v-rev">$0</div>
+              <div class="val-sub" id="v-tar">Target: $0</div>
+            </div>
+            <div class="donut-wrapper"><canvas id="revChart"></canvas><div class="donut-text" id="v-rev-p" style="color:var(--top)">0.00%</div></div>
+          </div>
+          <div class="term-wrapper" id="should-be-section">
+            <div id="v-cap">0.00% SHOULD BE</div>
+            <div id="v-line" class="line-white"></div>
+            <div class="term-bar"><div id="v-fill" class="term-fill"></div></div>
+            <div id="v-diff">0.00%</div>
+          </div>
+          <div id="run-rate-section" class="rev-row-align" style="background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid rgba(255,255,255,0.03);">
+            <div class="text-block-fixed">
+              <span class="lbl-header" style="color:var(--accent); margin:0; opacity:0.8">Run Rate Completion</span>
+              <div id="v-rr" class="val-huge" style="font-size:36px">$0</div>
+            </div>
+            <div class="donut-wrapper"><canvas id="rrChart"></canvas><div class="donut-text" id="v-rr-p" style="color:var(--accent)">0.00%</div></div>
+          </div>
+          <div id="live-daily-section" class="rev-row-align" style="display:none; background:rgba(0,255,136,0.03); border-radius:16px; border:1px solid rgba(0,255,136,0.1);">
+            <div class="text-block-fixed">
+              <span class="lbl-header" style="color:var(--top); margin:0; opacity:0.9">Today's Goal</span>
+              <div id="live-v-today" class="val-huge" style="font-size:36px; color:var(--top);">$0</div>
+              <div style="font-size:13px; color:rgba(255,255,255,0.45); margin-top:4px;"><span id="live-v-daily-goal">Goal: $0</span>&nbsp;&nbsp;<span id="live-v-daily-extra"></span></div>
+            </div>
+            <div class="donut-wrapper"><canvas id="live-daily-donut"></canvas><div class="donut-text" id="live-v-daily-pct" style="color:var(--top);">0%</div></div>
+          </div>
+        </div>
+        <div class="aux-sidebar" id="aux-sidebar">
+          <div class="aux-item"><i class="fa-solid fa-cart-shopping"></i><div><span class="lbl-header" style="margin:0">Amount of sales</span><div class="val" id="v-sales">0</div></div></div>
+          <div class="aux-item"><i class="fa-solid fa-tag"></i><div><span class="lbl-header" style="margin:0">AOV</span><div class="val" id="v-aov">$0</div></div></div>
+          <div class="aux-item"><i class="fa-solid fa-graduation-cap"></i><div><span class="lbl-header" style="margin:0">Lessons</span><div class="val" id="v-lessons">0</div></div></div>
+          <div class="aux-item"><i class="fa-solid fa-chart-line"></i><div><span class="lbl-header" style="margin:0">PPL</span><div class="val" id="v-ppl" style="color:var(--top)">$0</div></div></div>
+        </div>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <span class="lbl-header">Prediction</span>
+          <div style="display:flex; align-items:baseline;"><div class="val-huge" id="p-tot" style="color:var(--accent);">$0</div><span id="p-diff" class="diff-small"></span></div>
+        </div>
+        <div>
+          <div class="pipe-row" style="border-left:4px solid var(--accent); background:rgba(59,130,246,0.03)"><span class="pipe-label">Waiting for Decision</span><span id="p-wait" class="pipe-val"></span></div>
+          <div class="pipe-row" style="border-left:4px solid var(--high); background:rgba(251,191,36,0.03)"><span class="pipe-label">Negotiation</span><span id="p-neg" class="pipe-val"></span></div>
+          <div class="pipe-row" style="border-left:4px solid var(--top); background:rgba(0,255,136,0.03)"><span class="pipe-label">Payment Control</span><span id="p-pay" class="pipe-val"></span></div>
+        </div>
+        <div id="rem-box" style="padding:18px; border:1px solid var(--out); border-radius:12px; background:rgba(239,68,68,0.03); display:flex; align-items:center; justify-content:space-between">
+          <div><span class="pipe-label" id="rem-lbl" style="color:var(--out); font-size:14px;">Left</span><div id="v-rem" style="font-size:32px; font-weight:600; color:var(--out)">$0</div></div>
+          <div class="donut-wrapper" style="width:80px !important; height:80px !important;"><canvas id="gapChart"></canvas><div class="donut-text" id="v-rem-p" style="font-size:14px; color:var(--out)">0.00%</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="tasks-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+      <div class="card"><div style="text-align:center; color:var(--accent); font-weight:500; font-size:14px; margin-bottom:15px; letter-spacing:0.1em;">ADMIN</div><div id="t-admin"></div></div>
+      <div class="card"><div style="text-align:center; color:var(--high); font-weight:500; font-size:14px; margin-bottom:15px; letter-spacing:0.1em;">RUN</div><div id="t-run"></div></div>
+      <div class="card"><div style="text-align:center; color:var(--top); font-weight:500; font-size:14px; margin-bottom:15px; letter-spacing:0.1em;">OKRS</div><div id="t-okrs"></div></div>
+    </div>
+    <div class="perf-summary" id="perf-summary-section">
+      <div class="card perf-box" style="border-bottom:2px solid var(--top)"><div class="donut-wrapper donut-perf"><canvas id="c-top-chart"></canvas><div class="donut-text" id="c-top-val" style="font-size:18px;">0</div></div><span style="font-size:12px; color:var(--top)">TOP PERFORMANCE</span><div id="c-top-perc" style="font-size:14px; font-weight:600">0.00%</div></div>
+      <div class="card perf-box" style="border-bottom:2px solid var(--high)"><div class="donut-wrapper donut-perf"><canvas id="c-high-chart"></canvas><div class="donut-text" id="c-high-val" style="font-size:18px;">0</div></div><span style="font-size:12px; color:var(--high)">HIGH AVERAGE</span><div id="c-high-perc" style="font-size:14px; font-weight:600">0.00%</div></div>
+      <div class="card perf-box" style="border-bottom:2px solid var(--norm)"><div class="donut-wrapper donut-perf"><canvas id="c-norm-chart"></canvas><div class="donut-text" id="c-norm-val" style="font-size:18px;">0</div></div><span style="font-size:12px; color:var(--norm)">NORMAL AVERAGE</span><div id="c-norm-perc" style="font-size:14px; font-weight:600">0.00%</div></div>
+      <div class="card perf-box" style="border-bottom:2px solid var(--out)"><div class="donut-wrapper donut-perf"><canvas id="c-out-chart"></canvas><div class="donut-text" id="c-out-val" style="font-size:18px;">0</div></div><span style="font-size:12px; color:var(--out)">OUTLIERS</span><div id="c-out-perc" style="font-size:14px; font-weight:600">0.00%</div></div>
+    </div>
+    <div class="card">
+      <table class="mgr-table">
+        <thead>
+          <tr style="color:var(--text-dim); font-size:11px; text-transform:uppercase">
+            <th style="text-align:left; padding:10px 15px">Manager</th>
+            <th style="text-align:center">Sales</th>
+            <th style="text-align:center">Amount</th>
+            <th style="text-align:center; color:var(--accent)">Run Rate</th>
+            <th style="text-align:center">AOV</th>
+            <th style="text-align:center">PPL</th>
+            <th style="text-align:center">Avg Pkg</th>
+            <th style="text-align:center; padding-right:15px">Rating</th>
+          </tr>
+        </thead>
+        <tbody id="mgr-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end .main-container -->
+
+<script>
+  // ── Month config — add one line per new month ──────────────────────────────
+  const MONTHS = [
+    { key: 'live',    label: 'LIVE',        isLive: true,  current: false },
+    { key: '2026-04', label: 'April 2026',  isLive: false, current: false },
+    { key: '2026-05', label: 'May 2026',    isLive: false, current: true  },
+    // { key: '2026-06', label: 'June 2026', isLive: false, current: false },
+  ];
+  // ──────────────────────────────────────────────────────────────────────────
+
+  let activeMonth   = MONTHS.find(m => m.current)?.key || '2026-05';
+  let liveInterval  = null;
+  let countInterval = null;
+  let countSecs     = 60;
+
+  function renderTabs() {
+    document.getElementById('month-tabs').innerHTML = MONTHS.map(m => {
+      const isActive = m.key === activeMonth;
+      if (m.isLive) return `<button class="month-btn live-btn ${isActive ? 'active' : ''}" onclick="selectMonth('${m.key}')"><div class="live-dot-g"></div>${m.label}</button>`;
+      return `<button class="month-btn ${isActive ? 'active' : ''}" onclick="selectMonth('${m.key}')">${m.label}${m.current ? '<span class="month-badge">CURRENT</span>' : ''}</button>`;
+    }).join('');
+  }
+
+  function selectMonth(key) {
+    clearInterval(liveInterval); clearInterval(countInterval);
+    liveInterval = null; countInterval = null;
+    activeMonth  = key;
+    const isLive = key === 'live';
+    renderTabs();
+    document.getElementById('live-section').style.display    = isLive ? 'flex' : 'none';
+    document.getElementById('monthly-dashboard').style.display = isLive ? 'none' : 'flex';
+    document.getElementById('refresh-counter').style.display  = isLive ? 'block' : 'none';
+    loadData();
+    if (isLive) startLiveLoop();
+  }
+
+  function startLiveLoop() {
+    countSecs = 300;
+    countInterval = setInterval(() => {
+      countSecs--;
+      const el = document.getElementById('refresh-secs');
+      if (el) {
+        const m = Math.floor(countSecs / 60);
+        const s = String(countSecs % 60).padStart(2, '0');
+        el.innerText = m + ':' + s;
+      }
+      if (countSecs <= 0) { countSecs = 300; loadData(); }
+    }, 1000);
+  }
+
+  function fmtMoney(val) {
+    return (parseFloat(val) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+
+  function draw(id, perc, color) {
+    const ctx = document.getElementById(id); if (!ctx) return;
+    const ex = Chart.getChart(id); if (ex) ex.destroy();
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: { datasets: [{ data: [perc, Math.max(0, 100-perc)], backgroundColor: [color, 'rgba(255,255,255,0.05)'], borderWidth: 0 }] },
+      options: { cutout: '85%', plugins: { legend: { display: false }, tooltip: { enabled: false } }, maintainAspectRatio: false }
+    });
+  }
+
+  function renderManagerTargets(targets) {
+    const grid = document.getElementById('mgr-target-grid');
+    if (!targets || !targets.length) {
+      grid.innerHTML = '<div style="color:var(--text-dim); font-size:13px; padding:16px;">No manager data available.</div>';
+      return;
+    }
+
+    const now         = new Date();
+    const daysElapsed = now.getDate();
+    const totalDays   = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    const clr  = p => p >= 100 ? '#00ff88' : p >= 50 ? '#fbbf24' : '#ef4444';
+    const grad = p => p >= 100
+      ? 'linear-gradient(90deg,#00c96d,#00ff88)'
+      : p >= 50 ? 'linear-gradient(90deg,#d97706,#fbbf24)'
+      : 'linear-gradient(90deg,#dc2626,#ef4444)';
+
+    const sorted = [...targets].sort((a, b) => {
+      const pa = a.dailyGoal > 0 ? a.today / a.dailyGoal : 0;
+      const pb = b.dailyGoal > 0 ? b.today / b.dailyGoal : 0;
+      return pb - pa;
+    });
+
+    grid.innerHTML = sorted.map((m, idx) => {
+      const rank      = idx + 1;
+      const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.3)';
+
+      const dp       = m.dailyGoal > 0 ? (m.today / m.dailyGoal) * 100 : 0;
+      const dc       = clr(dp);
+      const runRate  = daysElapsed > 0 ? (m.monthlyTotal / daysElapsed) * totalDays : 0;
+      const rrPct    = m.target > 0 ? (runRate / m.target) * 100 : 0;
+      const mc       = clr(rrPct);
+
+      // Pill position: center of pill at end of fill, clamped so pill stays visible
+      const pillPct  = Math.min(Math.max(dp, 6), 96).toFixed(1);
+      const pillTxt  = dp > 999 ? '999%+' : dp.toFixed(0) + '%';
+
+      return `<div class="mgr-compact-row">
+        <span style="font-weight:800;color:${rankColor};text-align:center;">${rank}</span>
+        <span style="font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.name}</span>
+        <div style="position:relative;height:8px;background:rgba(255,255,255,0.07);border-radius:4px;">
+          <div style="height:100%;width:${Math.min(dp,100)}%;background:${grad(dp)};border-radius:4px;transition:width 0.9s ease;"></div>
+          <div style="position:absolute;top:50%;left:${pillPct}%;transform:translate(-50%,-50%);
+            background:${dc};border-radius:20px;padding:1px 6px;
+            font-size:9px;font-weight:800;color:#0d0f12;white-space:nowrap;
+            box-shadow:0 1px 5px rgba(0,0,0,0.5);z-index:2;line-height:1.5;">
+            ${pillTxt}
+          </div>
+        </div>
+        <div style="color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;">
+          <span style="color:rgba(255,255,255,0.25);">Goal:</span> ${fmtMoney(m.dailyGoal)}<span style="color:rgba(255,255,255,0.18);margin:0 3px;">/</span><span style="color:rgba(255,255,255,0.25);">Done</span> <span style="font-weight:600;color:${dc};">${fmtMoney(m.today)}</span>
+        </div>
+        <div style="color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;">
+          <span style="color:rgba(255,255,255,0.25);">Run rate</span> <span style="font-weight:700;color:${mc};">${rrPct.toFixed(0)}%</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Live animation helpers ─────────────────────────────────────────────────
+  const cometFrames = {};
+
+  function killComet(canvasId) {
+    if (cometFrames[canvasId]) { cancelAnimationFrame(cometFrames[canvasId]); delete cometFrames[canvasId]; }
+    const wrap = document.getElementById(canvasId + '-wrap');
+    if (wrap) { const ov = wrap.querySelector('.comet-ov'); if (ov) ov.remove(); }
+  }
+
+  function startComet(canvasId, filledPct, leftAmt) {
+    killComet(canvasId);
+    const wrap  = document.getElementById(canvasId + '-wrap');
+    const badge = document.getElementById(canvasId.replace('-donut', '') + '-badge');
+    if (!wrap) return;
+
+    const ov = document.createElement('canvas');
+    ov.className = 'comet-ov';
+    Object.assign(ov.style, { position:'absolute', inset:'0', pointerEvents:'none' });
+    const W = wrap.offsetWidth || 190, H = wrap.offsetHeight || 190;
+    ov.width = W; ov.height = H;
+    const dotText = wrap.querySelector('.donut-text');
+    dotText ? wrap.insertBefore(ov, dotText) : wrap.appendChild(ov);
+
+    const ctx    = ov.getContext('2d');
+    const cx = W / 2, cy = H / 2;
+    const outerR = Math.min(cx, cy) * 0.9;
+    const r      = outerR * 0.925;   // ring midpoint (cutout 85%)
+    const lw     = outerR * 0.158;   // ring thickness
+
+    const TOP     = -Math.PI / 2;
+    const fillEnd = TOP + (filledPct / 100) * Math.PI * 2;
+    const empty   = ((100 - filledPct) / 100) * Math.PI * 2;
+    const TAIL    = Math.PI / 2.5;
+    const SPEED   = 0.026;
+
+    let t = 0, phase = 'sweep', timer = 0;
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+
+      // faint green glow on entire empty arc
+      if (filledPct < 100) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, fillEnd, TOP + Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,255,136,0.07)';
+        ctx.lineWidth = lw;
+        ctx.stroke();
+      }
+
+      if (phase === 'sweep') {
+        t += SPEED;
+        const head = fillEnd + Math.min(t, empty);
+        const tail = head - TAIL;
+
+        // gradient comet tail (N segments with increasing opacity)
+        const N = 22;
+        for (let i = 0; i < N; i++) {
+          const s = tail + (i / N) * TAIL;
+          const e = s + TAIL / N + 0.006;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, s, e);
+          ctx.strokeStyle = `rgba(0,255,136,${(i / N) * 0.78})`;
+          ctx.lineWidth = lw;
+          ctx.lineCap = 'butt';
+          ctx.stroke();
+        }
+
+        // head glow
+        const hx = cx + r * Math.cos(head), hy = cy + r * Math.sin(head);
+        const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, lw * 1.7);
+        g.addColorStop(0,   'rgba(160,255,210,0.95)');
+        g.addColorStop(0.4, 'rgba(0,255,136,0.55)');
+        g.addColorStop(1,   'rgba(0,255,136,0)');
+        ctx.beginPath(); ctx.arc(hx, hy, lw * 1.7, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+
+        if (t >= empty) {
+          phase = 'show'; timer = 85;
+          if (badge) { badge.textContent = 'LEFT  ' + fmtMoney(leftAmt); badge.style.opacity = '1'; }
+        }
+      } else if (phase === 'show') {
+        if (--timer <= 0) {
+          phase = 'gap'; timer = 55;
+          if (badge) badge.style.opacity = '0';
+        }
+      } else {
+        if (--timer <= 0) { t = 0; phase = 'sweep'; }
+      }
+
+      cometFrames[canvasId] = requestAnimationFrame(frame);
+    }
+    cometFrames[canvasId] = requestAnimationFrame(frame);
+  }
+
+  function setIndicator(spanId, value) {
+    const el = document.getElementById(spanId);
+    if (!el) return;
+    if (value <= 0) {
+      el.innerHTML = '<span class="lv-loader"></span>';
+    } else {
+      el.innerHTML = [0, 0.45, 0.9].map(d =>
+        `<span class="lv-arrow" style="animation-delay:${d}s">↑</span>`
+      ).join('');
+    }
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  function renderLive(d) {
+    const LIVE_BLUE = '#3b82f6';
+
+    document.getElementById('live-updated').innerText =
+      'Updated ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // Card 1 — Revenue vs Target
+    const today    = d.metrics.liveToday || 0;
+    const totalRev = (d.metrics.rev || 0) + today;
+    const tar      = d.metrics.tar || 1;
+    const revPct   = (totalRev / tar) * 100;
+    const revEl    = document.getElementById('lv-rev');
+    revEl.innerText    = fmtMoney(totalRev);
+    revEl.style.color  = totalRev > 0 ? '#00cc77' : '#fff';
+    document.getElementById('lv-tar').innerText   = fmtMoney(tar);
+    document.getElementById('lv-rev-p').innerText = revPct.toFixed(1) + '%';
+    draw('lv-rev-donut', Math.min(revPct, 100), LIVE_BLUE);
+    setIndicator('lv-rev-ind', totalRev);
+    startComet('lv-rev-donut', Math.min(revPct, 100), Math.max(0, tar - totalRev));
+
+    // Card 2 — Today's Goal
+    const dailyGoal = d.metrics.dailyGoal || 1;
+    const dayPct    = (today / dailyGoal) * 100;
+    const excess    = today - dailyGoal;
+    const todayEl   = document.getElementById('lv-today');
+    todayEl.innerText   = fmtMoney(today);
+    todayEl.style.color = today > 0 ? '#00cc77' : '#fff';
+    document.getElementById('lv-daily-goal').innerText = fmtMoney(dailyGoal);
+    document.getElementById('lv-daily-pct').innerText  = dayPct.toFixed(1) + '%';
+    const extraEl = document.getElementById('lv-daily-extra');
+    extraEl.innerText   = excess > 0 ? '+' + fmtMoney(excess) + ' above goal 🔥' : '';
+    extraEl.style.color = excess > 0 ? '#00ff88' : 'var(--text-dim)';
+    draw('lv-daily-donut', Math.min(dayPct, 100), LIVE_BLUE);
+    setIndicator('lv-today-ind', today);
+    startComet('lv-daily-donut', Math.min(dayPct, 100), Math.max(0, dailyGoal - today));
+
+    // Card 3 — Prediction
+    document.getElementById('lv-p-tot').innerText = fmtMoney(d.pipe.tot);
+    const diffAmt = d.pipe.tot - d.metrics.left;
+    const pDiff   = document.getElementById('lv-p-diff');
+    pDiff.innerText   = (diffAmt >= 0 ? '+' : '') + fmtMoney(diffAmt);
+    pDiff.style.color = diffAmt >= 0 ? 'var(--top)' : 'var(--out)';
+    document.getElementById('lv-p-wait').innerText = fmtMoney(d.pipe.wait);
+    document.getElementById('lv-p-neg').innerText  = fmtMoney(d.pipe.neg);
+    document.getElementById('lv-p-pay').innerText  = fmtMoney(d.pipe.pay);
+
+    const remVal      = d.metrics.left;
+    const coveragePct = remVal > 0 ? (d.pipe.tot / remVal) * 100 : 100;
+    document.getElementById('lv-rem').innerText = fmtMoney(remVal);
+    document.getElementById('lv-rem-p').innerText = coveragePct.toFixed(1) + '%';
+    draw('lv-gap-chart', Math.min(coveragePct, 100), LIVE_BLUE);
+  }
+
+  function render(d) {
+    document.getElementById('loading').classList.remove('show');
+    if (!d || d.error) return;
+    if (activeMonth === 'live') { renderLive(d); return; }
+    renderMonthly(d);
+  }
+
+  function renderMonthly(d) {
+    const fP = (d.metrics.rev / (d.metrics.tar || 1)) * 100;
+    const sP = (d.metrics.should || 0) * 100;
+    const shouldFactor = d.metrics.should || 0.3;
+
+    document.getElementById('v-rev').innerText   = fmtMoney(d.metrics.rev);
+    document.getElementById('v-tar').innerText   = 'Target: ' + fmtMoney(d.metrics.tar);
+    document.getElementById('v-rev-p').innerText = fP.toFixed(2) + '%';
+    draw('revChart', fP, '#00ff88');
+
+    document.getElementById('v-fill').style.width      = Math.min(Math.max(0, fP), 100) + '%';
+    document.getElementById('v-fill').style.background = fP >= sP ? 'var(--top)' : 'var(--high)';
+    document.getElementById('v-line').style.left        = Math.min(Math.max(0, sP), 100) + '%';
+    const capElem = document.getElementById('v-cap');
+    capElem.style.left = Math.min(Math.max(0, sP), 100) + '%';
+    capElem.innerText  = sP.toFixed(2) + '% SHOULD BE';
+    const diffElem = document.getElementById('v-diff');
+    diffElem.style.left  = Math.min(Math.max(0, fP), 100) + '%';
+    diffElem.innerText   = (fP - sP >= 0 ? '+' : '') + (fP - sP).toFixed(2) + '%';
+    diffElem.style.color = (fP - sP) >= 0 ? 'var(--top)' : 'var(--out)';
+
+    document.getElementById('v-rr').innerText   = fmtMoney(d.metrics.rrComp);
+    const rrP = (d.metrics.rrPerc || 0) * 100;
+    document.getElementById('v-rr-p').innerText = rrP.toFixed(2) + '%';
+    draw('rrChart', rrP, '#3b82f6');
+
+    document.getElementById('v-sales').innerText   = d.metrics.sales;
+    document.getElementById('v-aov').innerText     = fmtMoney(d.metrics.aov);
+    document.getElementById('v-lessons').innerText = d.metrics.lessons;
+    document.getElementById('v-ppl').innerText     = fmtMoney(d.metrics.ppl);
+
+    document.getElementById('p-tot').innerText = fmtMoney(d.pipe.tot);
+    const diffAmt = d.pipe.tot - d.metrics.left;
+    const pDiff = document.getElementById('p-diff');
+    pDiff.innerText = (diffAmt >= 0 ? '+' : '') + fmtMoney(diffAmt);
+    pDiff.style.color = diffAmt >= 0 ? 'var(--top)' : 'var(--out)';
+    document.getElementById('p-wait').innerText = fmtMoney(d.pipe.wait);
+    document.getElementById('p-neg').innerText  = fmtMoney(d.pipe.neg);
+    document.getElementById('p-pay').innerText  = fmtMoney(d.pipe.pay);
+
+    const remVal = d.metrics.left;
+    const coveragePerc = remVal > 0 ? (d.pipe.tot / remVal) * 100 : 100;
+    const statusColor  = coveragePerc >= 100 ? 'var(--top)' : coveragePerc >= 50 ? 'var(--high)' : 'var(--out)';
+    document.getElementById('v-rem').innerText           = fmtMoney(remVal);
+    document.getElementById('v-rem').style.color         = statusColor;
+    document.getElementById('rem-lbl').style.color       = statusColor;
+    document.getElementById('rem-box').style.borderColor = statusColor;
+    draw('gapChart', Math.min(coveragePerc, 100), statusColor);
+    document.getElementById('v-rem-p').innerText      = coveragePerc.toFixed(2) + '%';
+    document.getElementById('v-rem-p').style.color    = statusColor;
+
+    const st = (id, arr, c) => {
+      document.getElementById(id).innerHTML = arr && arr.length
+        ? arr.map(i => `<div class="task-item" style="border-color:${c}">${i}</div>`).join('')
+        : '<div style="color:var(--text-dim); font-size:12px; text-align:center">No tasks</div>';
+    };
+    st('t-admin', d.tasks.admin, 'var(--accent)');
+    st('t-run',   d.tasks.run,   'var(--high)');
+    st('t-okrs',  d.tasks.okrs,  'var(--top)');
+
+    let dist = { top:0, high:0, norm:0, out:0 };
+    if (d.managers && d.managers.length) {
+      document.getElementById('mgr-list').innerHTML = d.managers.map(m => {
+        let color = 'var(--norm)';
+        const r = (m.rating || '').toLowerCase();
+        if (r.includes('top'))          { color = 'var(--top)';  dist.top++;  }
+        else if (r.includes('high'))    { color = 'var(--high)'; dist.high++; }
+        else if (r.includes('outlier')) { color = 'var(--out)';  dist.out++;  }
+        else dist.norm++;
+        return `<tr class="mgr-row">
+          <td style="padding:12px 15px; font-weight:500;">${m.name}</td>
+          <td style="text-align:center">${m.sales}</td>
+          <td style="text-align:center">${fmtMoney(m.amount)}</td>
+          <td style="text-align:center; font-weight:600; color:var(--accent)">${fmtMoney(m.amount / shouldFactor)}</td>
+          <td style="text-align:center">${fmtMoney(m.aov)}</td>
+          <td style="text-align:center">$${(m.ppl || 0).toFixed(2)}</td>
+          <td style="text-align:center">${(m.pkg || 0).toFixed(2)}</td>
+          <td style="text-align:right; padding-right:15px"><span class="pill" style="background:${color}">${m.rating}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    const total = d.managers.length || 1;
+    const setPerf = (id, val, color) => {
+      draw(id + '-chart', (val/total)*100, color);
+      document.getElementById(id + '-val').innerText  = val;
+      document.getElementById(id + '-perc').innerText = ((val/total)*100).toFixed(2) + '%';
+    };
+    setPerf('c-top',  dist.top,  '#00ff88');
+    setPerf('c-high', dist.high, '#fbbf24');
+    setPerf('c-norm', dist.norm, '#f97316');
+    setPerf('c-out',  dist.out,  '#ef4444');
+  }
+
+  function loadData() {
+    document.getElementById('loading').classList.add('show');
+    fetch(`/api/direction/brasil?month=${activeMonth}`)
+      .then(r => r.json())
+      .then(render)
+      .catch(err => { document.getElementById('loading').classList.remove('show'); console.error(err); });
+  }
+
+  window.onload = () => { renderTabs(); loadData(); };
+</script>
+</body>
+</html>

@@ -73,9 +73,36 @@ function doPost(e) {
   }
 }
 
-// Health check
-function doGet() {
+// Health check + checkActive
+function doGet(e) {
+  var action = (e.parameter && e.parameter.action) || '';
+  if (action === 'checkActive') return checkUserActive(e.parameter.email || '');
   return respond({ status: 'ok', service: 'ism-auth' });
+}
+
+function checkUserActive(email) {
+  if (!email) return respond({ active: false });
+  try {
+    var ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(SHEET_NAME);
+    var data  = sheet.getDataRange().getValues();
+    var heads = data[0].map(function(h) { return String(h).trim().toLowerCase(); });
+    var colEmail  = heads.indexOf('email');
+    var colActive = heads.indexOf('active');
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][colEmail]).trim().toLowerCase() === email.trim().toLowerCase()) {
+        var isActive = data[i][colActive] === true
+          || String(data[i][colActive]).toLowerCase() === 'true'
+          || data[i][colActive] === 1;
+        return respond({ active: isActive });
+      }
+    }
+    // User not found in sheet = revoke access
+    return respond({ active: false });
+  } catch(err) {
+    // On GAS error, keep session (avoid accidental lockouts)
+    return respond({ active: true, error: String(err) });
+  }
 }
 
 function respond(data) {

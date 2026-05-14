@@ -11,6 +11,7 @@ declare module 'next-auth' {
       turno_fin: string
       foto?: string
       pestana?: string
+      isAdmin?: boolean
     }
   }
   interface User {
@@ -33,5 +34,6 @@ declare module 'next-auth/jwt' {
     turno_fin: string
     foto?: string
     pestana?: string
+    isAdmin?: boolean
   }
 }

@@ -430,7 +430,7 @@ export default function Relatorio() {
     <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', height:'calc(100vh - 73px)', overflow:'hidden' }}>
 
       {/* ── LEFT ── */}
-      <form onSubmit={submit} style={{ padding:'20px 28px', display:'flex', flexDirection:'column', gap:10, overflow:'hidden' }}>
+      <form onSubmit={submit} style={{ padding:'20px 28px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto' }}>
 
         {/* progress header — reemplaza el título duplicado */}
         <div style={{ flexShrink:0 }}>
@@ -522,18 +522,15 @@ export default function Relatorio() {
           </F>
         </div>
 
-        {/* espacio flexible para empujar el botón al fondo */}
-        <div style={{ flex:1 }} />
-
         {/* SUBMIT */}
-        <div style={{ flexShrink:0 }}>
+        <div style={{ flexShrink:0, paddingBottom:8 }}>
           <SubmitBtn status={status} isValid={isValid} />
         </div>
 
       </form>
 
       {/* ── RIGHT — preview ── */}
-      <div style={{ borderLeft:'1px solid rgba(255,255,255,0.05)', background:'rgba(8,11,16,0.95)', padding:'20px 18px', display:'flex', flexDirection:'column', gap:10, overflow:'hidden' }}>
+      <div style={{ borderLeft:'1px solid rgba(255,255,255,0.05)', background:'rgba(8,11,16,0.95)', padding:'20px 18px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto' }}>
 
         <div style={{ fontSize:9.5, letterSpacing:'0.04em', textTransform:'uppercase', color:'rgba(232,237,245,0.18)', fontFamily:"'Inter', sans-serif", flexShrink:0 }}>— Preview em tempo real</div>
 

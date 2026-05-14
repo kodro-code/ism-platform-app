@@ -44,26 +44,65 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
+      // Always recompute isAdmin — handles old JWTs and changes to ADMIN_EMAILS
+      const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean)
+
+      // ── Initial sign-in ──────────────────────────────────────────────────────
       if (user) {
+        const email = (user as any).email ?? ''
+        token.email        = email
         token.nombre       = (user as any).nombre
         token.rol          = (user as any).rol
         token.turno_inicio = (user as any).turno_inicio
         token.turno_fin    = (user as any).turno_fin
         token.foto         = (user as any).foto    ?? ''
         token.pestana      = (user as any).pestana ?? ''
-        // Expira el día 2 del mes siguiente
+        token.isAdmin      = adminEmails.includes(String(email).toLowerCase())
         token.exp          = next2ndOfMonth()
+        token.lastChecked  = Math.floor(Date.now() / 1000)
+        return token
       }
+
+      // Refresh isAdmin on every token rotation (fixes old JWTs without re-login)
+      token.isAdmin = adminEmails.includes(String(token.email ?? '').toLowerCase())
+
+      // ── Periodic active check (every 15 minutes) ─────────────────────────────
+      const now         = Math.floor(Date.now() / 1000)
+      const lastChecked = (token.lastChecked as number) ?? 0
+
+      if (now - lastChecked > 15 * 60) {
+        try {
+          const url  = `${process.env.GAS_AUTH_URL}?action=checkActive&email=${encodeURIComponent(String(token.email))}`
+          const res  = await fetch(url)
+          const data = await res.json()
+
+          if (data.active === false) {
+            // User removed or deactivated — revoke token
+            return { ...token, revoked: true }
+          }
+          token.lastChecked = now
+        } catch {
+          // GAS unreachable — keep session, retry next interval
+          token.lastChecked = now
+        }
+      }
+
       return token
     },
+
     session({ session, token }) {
+      // If token was revoked, return an empty session (forces sign-out on client)
+      if ((token as any).revoked) return null as any
+
+      session.user.email        = String(token.email ?? '')
       session.user.nombre       = token.nombre
       session.user.rol          = token.rol
       session.user.turno_inicio = token.turno_inicio
       session.user.turno_fin    = token.turno_fin
       session.user.foto         = token.foto
       session.user.pestana      = token.pestana
+      session.user.isAdmin      = token.isAdmin ?? false
       return session
     },
   },

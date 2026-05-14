@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import KoddyWidget from '@/components/koddy-widget';
 
 function UserAvatar({ name, fileId }: { name: string; photoUrl: string; fileId: string }) {
   const [err, setErr] = useState(false);
@@ -21,16 +22,19 @@ type Child   = { id: string; label: string; icon: string; route: string; desc?: 
 type NavItem = { id: string; label: string; icon?: string; route?: string; children?: Child[] };
 
 const NAV: NavItem[] = [
-  { id: 'home',    label: 'Home',           route: '/' },
-  { id: 'team',    label: 'Meet the Team',  route: '/team' },
-  { id: 'logros',  label: 'Achievements',   route: '/logros' },
+  { id: 'home',       label: 'Home',           route: '/' },
+  { id: 'team',       label: 'Meet the Team',  route: '/team' },
+  { id: 'logros',     label: 'Achievements',   route: '/logros' },
+  { id: 'guides',     label: 'Guides',         route: '/guides' },
   {
     id: 'tools', label: 'Tools', route: '/tools',
     children: [
-      { id: 'calculadora', label: 'Calculadora de Preços', icon: '🧮', route: '/calculadora', desc: 'Calcule preços, margens e impostos' },
-      { id: 'relatorio',   label: 'Relatório de Vendas',  icon: '📋', route: '/relatorio',   desc: 'Visualize e filtre vendas por período' },
-      { id: 'cashback',    label: 'Gerador de Cashback',  icon: '💵', route: '/cashback',    desc: 'Gere links de cashback para clientes' },
-      { id: 'turno',       label: 'Registro de Turno',    icon: '🕐', route: '/turno',       desc: 'Relatório de final de turno e solicitações' },
+      { id: 'minha-area',  label: 'Minha Área',           icon: '📊', route: '/minha-area',       desc: 'Relatório mensal de performance pessoal' },
+      { id: 'soporte',     label: 'Suporte Técnico',       icon: '🎫', route: '/soporte',          desc: 'Abra um ticket de suporte técnico' },
+      { id: 'calculadora', label: 'Calculadora de Preços', icon: '🧮', route: '/calculadora',      desc: 'Calcule preços, margens e impostos' },
+      { id: 'relatorio',   label: 'Relatório de Vendas',  icon: '📋', route: '/relatorio',        desc: 'Visualize e filtre vendas por período' },
+      { id: 'cashback',    label: 'Gerador de Cashback',  icon: '💵', route: '/cashback',         desc: 'Gere links de cashback para clientes' },
+      { id: 'turno',       label: 'Registro de Turno',    icon: '🕐', route: '/turno',            desc: 'Relatório de final de turno e solicitações' },
       { id: 'indicacoes',  label: 'Indicações',           icon: '🔗', route: '/tools/indicacoes', desc: 'Gere links de indicação e acompanhe referrals' },
     ],
   },
@@ -41,11 +45,11 @@ const NAV: NavItem[] = [
   {
     id: 'direction', label: 'Direction', route: '/direction',
     children: [
-      { id: 'brasil',            label: 'LX Presentation', icon: '📊', route: '/direction/brasil',            desc: 'Apresentação para a equipe LX' },
-      { id: 'dir-indicacoes',    label: 'Indicações',      icon: '🔗', route: '/direction/indicacoes',        desc: 'Painel de indicações de todos os managers' },
+      { id: 'brasil',            label: 'LX Presentation',         icon: '📊', route: '/direction/brasil',      desc: 'Apresentação para a equipe LX' },
+      { id: 'dir-indicacoes',    label: 'Indicações',              icon: '🔗', route: '/direction/indicacoes',  desc: 'Painel de indicações de todos os managers' },
+      { id: 'perf-managers',     label: 'Performance per Manager', icon: '📈', route: '/minha-area',            desc: 'Relatório de performance de todos os managers' },
     ],
   },
-  { id: 'soporte', label: 'Suporte Técnico', icon: '🎫', route: '/soporte' },
 ];
 
 // Export for landing pages to use
@@ -148,10 +152,17 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   // Login page: render bare, no shell — DESPUÉS de todos los hooks
   if (pathname === '/login' || pathname.startsWith('/indicacao')) return <>{children}</>;
 
-  const isAdmin    = session?.user?.rol === 'admin';
+  const isAdmin    = (session?.user as any)?.isAdmin ?? session?.user?.rol === 'admin';
   const userName   = (session?.user?.nombre ?? '').replace(/^ISM\s+/i, '').trim().split(' ')[0];
   const userFoto   = session?.user?.foto ?? '';
-  const visibleNav = NAV.filter(item => item.id !== 'direction' || isAdmin);
+  const visibleNav = NAV
+    .filter(item => item.id !== 'direction' || isAdmin)
+    .map(item => {
+      if (item.id === 'tools' && isAdmin) {
+        return { ...item, children: item.children?.filter(c => c.id !== 'minha-area') }
+      }
+      return item
+    })
 
   function fileId(url: string) {
     if (!url) return '';
@@ -179,11 +190,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     setOpenSidebar(item.id);
   }
 
-  const isFullPage = ['/calculadora', '/cashback'].includes(pathname) || pathname.startsWith('/direction/');
+  const isFullPage = ['/calculadora', '/cashback', '/minha-area', '/guides'].includes(pathname) || pathname.startsWith('/direction/');
 
   const navBg     = scrolled ? 'rgba(8,11,16,0.96)' : 'rgba(8,11,16,0.55)';
   const navBorder = scrolled ? 'var(--border)' : 'transparent';
-  const activeSidebarItem = NAV.find(n => n.id === openSidebar);
+  const activeSidebarItem = visibleNav.find(n => n.id === openSidebar);
 
   return (
     <>
@@ -399,6 +410,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       >
         {children}
       </div>
+
+      <KoddyWidget />
     </>
   );
 }

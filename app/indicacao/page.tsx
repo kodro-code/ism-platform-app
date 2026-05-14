@@ -67,7 +67,7 @@ function CodeRain() {
     xs.flatMap((x, ci) =>
       Array.from({ length: 5 }, (_, ri) => {
         const text = CODE_SNIPPETS[(ci * 5 + ri * 3) % CODE_SNIPPETS.length];
-        const dur  = 9 + ((ci * 2 + ri) % 5);
+        const dur  = 24 + ((ci * 2 + ri) % 9);
         const del  = (ri / 5) * dur;
         return (
           <div key={`${green ? 'L' : 'R'}${ci}-${ri}`} style={{
@@ -533,7 +533,7 @@ function PageShell({ clientName }: { clientName: string }) {
 
           {/* Courses strip */}
           <div style={{ marginTop: 28, padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-            {['🐍 Python', '⛏️ Minecraft', '🎮 Roblox', '🦎 Scratch', '🕹️ Unity'].map(s => (
+            {['💻 Programação', '🎨 Design', '🕹️ Dev de Jogos', '🖌️ UI/UX', '🤖 Inteligência Artificial'].map(s => (
               <span key={s} style={{ fontSize: 11, color: 'rgba(255,255,255,0.32)', fontFamily: "'Inter',sans-serif" }}>{s}</span>
             ))}
           </div>

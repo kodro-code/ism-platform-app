@@ -19,6 +19,14 @@ const ITEMS = [
     color: 'rgba(168,85,247,0.12)',
     glow: 'rgba(168,85,247,0.2)',
   },
+  {
+    icon: '📈',
+    label: 'Performance per Manager',
+    desc: 'Relatório mensal de performance individual — metas, run rate, upgrades e avaliação.',
+    route: '/minha-area',
+    color: 'rgba(0,255,178,0.10)',
+    glow: 'rgba(0,255,178,0.2)',
+  },
 ];
 
 export default function DirectionPage() {

@@ -414,67 +414,14 @@ export default function GuidesPage() {
         }
       `}</style>
 
-      {/* ── Landing ──────────────────────────────────────────────────────── */}
-      {!section && (
-        <div style={{ padding:'56px 40px', maxWidth:860, margin:'0 auto', fontFamily:"'DM Sans',sans-serif" }}>
-          <div style={{ marginBottom:48 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:10, fontFamily:"'Inter',sans-serif" }}>
-              Guides
-            </div>
-            <h1 style={{ margin:0, fontSize:32, fontWeight:800, letterSpacing:'-0.02em', background:'linear-gradient(135deg,#E8EDF5 30%,rgba(232,237,245,0.5))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', fontFamily:"'Inter',sans-serif" }}>
-              Processos & Políticas
-            </h1>
-            <p style={{ margin:'10px 0 0', fontSize:15, color:'var(--text-dim)', maxWidth:440 }}>
-              Documentos internos — regulamento, penalidades e caminhos de crescimento.
-            </p>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))', gap:18 }}>
-            {GUIDE_CARDS.map((card, i) => (
-              <div
-                key={card.id}
-                onClick={() => setSection(card.id)}
-                style={{
-                  background:'var(--card)', border:'1px solid var(--border)',
-                  borderRadius:16, padding:'28px 24px', cursor:'pointer',
-                  transition:'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
-                  animation:`fadeUp 0.35s ease both`, animationDelay:`${i * 0.07}s`,
-                  position:'relative', overflow:'hidden',
-                }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = card.glow; el.style.transform = 'translateY(-4px)'; el.style.boxShadow = `0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px ${card.color}`; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)'; el.style.boxShadow = 'none'; }}
-              >
-                <div style={{ position:'absolute', top:-30, right:-30, width:100, height:100, borderRadius:'50%', background:card.color, filter:'blur(28px)', pointerEvents:'none' }} />
-                <div style={{ width:48, height:48, borderRadius:12, marginBottom:18, background:card.color, border:`1px solid ${card.glow}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>
-                  {card.icon}
-                </div>
-                <h3 style={{ margin:'0 0 8px', fontSize:15, fontWeight:700, color:'var(--text)', fontFamily:"'Inter',sans-serif" }}>{card.label}</h3>
-                <p style={{ margin:'0 0 20px', fontSize:13, color:'var(--text-dim)', lineHeight:1.6 }}>{card.desc}</p>
-                <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:600, color:card.accent, fontFamily:"'Inter',sans-serif" }}>
-                  Abrir <span style={{ fontSize:11 }}>→</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div style={{ display:'flex', height:'100%', overflow:'hidden' }}>
 
-      {/* ── Section view ─────────────────────────────────────────────────── */}
-      {section && <div style={{ display:'flex', height:'100%', overflow:'hidden' }}>
-
-        {/* ── Sidebar ────────────────────────────────────────────────────── */}
+        {/* ── Sidebar — always visible ──────────────────────────────────── */}
         <div style={{
           width:220, flexShrink:0, background:'#07090F',
           borderRight:'1px solid rgba(255,255,255,0.07)',
           display:'flex', flexDirection:'column', padding:'24px 10px',
         }}>
-          <button
-            onClick={() => setSection(null)}
-            style={{ display:'flex', alignItems:'center', gap:7, padding:'7px 8px', borderRadius:8, marginBottom:14, background:'transparent', border:'none', color:'rgba(232,237,245,0.35)', cursor:'pointer', fontSize:12, fontFamily:"'Inter',sans-serif", transition:'color 0.12s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(232,237,245,0.75)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(232,237,245,0.35)' }}
-          >
-            ← Voltar
-          </button>
           <div style={{ padding:'0 6px 18px', borderBottom:'1px solid rgba(255,255,255,0.06)', marginBottom:12 }}>
             <div style={{ fontSize:11, fontWeight:700, color:'rgba(232,237,245,0.3)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:2 }}>Guides</div>
             <div style={{ fontSize:12, color:'rgba(232,237,245,0.28)', fontFamily:"'DM Sans',sans-serif" }}>Processos e políticas</div>
@@ -500,7 +447,48 @@ export default function GuidesPage() {
         </div>
 
         {/* ── Content ────────────────────────────────────────────────────── */}
-        <div style={{ flex:1, overflowY:'auto', padding:'36px 40px 64px', background:'#08090F' }}>
+        <div style={{ flex:1, overflowY:'auto', background:'#08090F' }}>
+
+        {/* Landing — shown when no section selected */}
+        {!section && (
+          <div style={{ padding:'48px 40px', maxWidth:760, fontFamily:"'DM Sans',sans-serif" }}>
+            <div style={{ marginBottom:40 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8, fontFamily:"'Inter',sans-serif" }}>Guides</div>
+              <h1 style={{ margin:0, fontSize:28, fontWeight:800, letterSpacing:'-0.02em', background:'linear-gradient(135deg,#E8EDF5 30%,rgba(232,237,245,0.5))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', fontFamily:"'Inter',sans-serif" }}>
+                Processos & Políticas
+              </h1>
+              <p style={{ margin:'8px 0 0', fontSize:14, color:'var(--text-dim)' }}>
+                Selecione uma secção no menu lateral ou clique num card para começar.
+              </p>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))', gap:16 }}>
+              {GUIDE_CARDS.map((card, i) => (
+                <div
+                  key={card.id}
+                  onClick={() => setSection(card.id)}
+                  style={{
+                    background:'var(--card)', border:'1px solid var(--border)',
+                    borderRadius:16, padding:'24px 20px', cursor:'pointer',
+                    transition:'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                    animation:`fadeUp 0.35s ease both`, animationDelay:`${i * 0.07}s`,
+                    position:'relative', overflow:'hidden',
+                  }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = card.glow; el.style.transform = 'translateY(-3px)'; el.style.boxShadow = `0 12px 40px rgba(0,0,0,0.3)`; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)'; el.style.boxShadow = 'none'; }}
+                >
+                  <div style={{ position:'absolute', top:-24, right:-24, width:80, height:80, borderRadius:'50%', background:card.color, filter:'blur(24px)', pointerEvents:'none' }} />
+                  <div style={{ width:44, height:44, borderRadius:10, marginBottom:14, background:card.color, border:`1px solid ${card.glow}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>{card.icon}</div>
+                  <h3 style={{ margin:'0 0 6px', fontSize:14, fontWeight:700, color:'var(--text)', fontFamily:"'Inter',sans-serif" }}>{card.label}</h3>
+                  <p style={{ margin:'0 0 16px', fontSize:12.5, color:'var(--text-dim)', lineHeight:1.6 }}>{card.desc}</p>
+                  <div style={{ fontSize:12, fontWeight:600, color:card.accent, fontFamily:"'Inter',sans-serif" }}>Abrir →</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section content */}
+        {section && <div style={{ padding:'36px 40px 64px' }}>
 
           {section === 'multas' && (
             <div>
@@ -692,8 +680,10 @@ export default function GuidesPage() {
               </div>
             </div>
           )}
+        </div>}
+
         </div>
-      </div>}
+      </div>
 
     </>
   )

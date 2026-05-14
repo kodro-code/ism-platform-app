@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
+import DiamondBg from '@/components/diamond-bg';
 
 const ITEMS = [
   {
@@ -33,7 +34,9 @@ export default function DirectionPage() {
   const router = useRouter();
 
   return (
-    <div style={{ padding:'56px 40px', maxWidth:900, margin:'0 auto', fontFamily:"'DM Sans',sans-serif" }}>
+    <div style={{ position:'relative', padding:'56px 40px', maxWidth:900, margin:'0 auto', fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
+      <DiamondBg />
+      <div style={{ position:'relative', zIndex:1 }}>
 
       {/* Header */}
       <div style={{ marginBottom:48 }}>
@@ -111,6 +114,7 @@ export default function DirectionPage() {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import DiamondBg from '@/components/diamond-bg'
 
 type Section = 'multas' | 'crescimento'
 
@@ -451,7 +452,9 @@ export default function GuidesPage() {
 
         {/* Landing — shown when no section selected */}
         {!section && (
-          <div style={{ padding:'48px 40px', maxWidth:760, fontFamily:"'DM Sans',sans-serif" }}>
+          <div style={{ position:'relative', padding:'48px 40px', maxWidth:760, fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
+            <DiamondBg />
+            <div style={{ position:'relative', zIndex:1 }}>
             <div style={{ marginBottom:40 }}>
               <div style={{ fontSize:12, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8, fontFamily:"'Inter',sans-serif" }}>Guides</div>
               <h1 style={{ margin:0, fontSize:28, fontWeight:800, letterSpacing:'-0.02em', background:'linear-gradient(135deg,#E8EDF5 30%,rgba(232,237,245,0.5))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', fontFamily:"'Inter',sans-serif" }}>
@@ -484,6 +487,7 @@ export default function GuidesPage() {
                 </div>
               ))}
             </div>
+            </div>{/* zIndex:1 */}
           </div>
         )}
 

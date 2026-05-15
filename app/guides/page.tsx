@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import DiamondBg from '@/components/diamond-bg'
+import BOFlowView from '@/components/guides-bo-flow'
 
-type Section = 'multas' | 'crescimento'
+type Section = 'multas' | 'crescimento' | 'bo-flow'
 
 interface Multa {
   icon: string
@@ -307,6 +308,7 @@ function CrescimentoView() {
 const SIDEBAR_ITEMS: Array<{ id: Section; icon: string; label: string; soon?: boolean }> = [
   { id:'multas',      icon:'⚖️', label:'Multas & Penalidades' },
   { id:'crescimento', icon:'📈', label:'Processo de Crescimento' },
+  { id:'bo-flow',     icon:'🗺️', label:'Fluxo de Trabalho BO' },
 ]
 
 const thStyle: React.CSSProperties = {
@@ -589,6 +591,7 @@ export default function GuidesPage() {
           )}
 
           {section === 'crescimento' && <CrescimentoView />}
+          {section === 'bo-flow' && <BOFlowView />}
 
           {false && (
             <div>

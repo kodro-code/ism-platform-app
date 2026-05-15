@@ -424,21 +424,19 @@ function FlowMap({ sel, onSel }:{ sel:string|null; onSel:(id:string, el:HTMLDivE
           </div>
         </div>
 
-        {/* Fork from Payment Control: paid exits right, not paid continues down */}
-        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'center', gap:10, marginTop:0 }}>
-          {/* Not paid: vertical arrow continues to reserve section */}
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
-            <div style={{ fontSize:7.5, fontWeight:700, color:'rgba(255,76,76,0.5)', fontFamily:"'Inter',sans-serif", marginBottom:2 }}>❌ não pagou</div>
-            <AnimVArrow color="#FF4C4C" height={22} />
-          </div>
-          {/* Paid: horizontal exits to payment statuses */}
-          <div style={{ display:'flex', alignItems:'center', gap:7, paddingTop:10 }}>
-            <span style={{ fontSize:8, fontWeight:700, color:'rgba(0,255,178,0.5)', fontFamily:"'Inter',sans-serif", whiteSpace:'nowrap' }}>✅ pagou</span>
-            <AnimHArrow color="#00FFB2" width={14} />
-            {n('payment-received')}
-            <AnimHArrow color="#FFD70066" width={12} />
-            {n('installment')}
-          </div>
+        {/* Paid exits — horizontal row from Payment Control */}
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:6 }}>
+          <span style={{ fontSize:11, fontWeight:700, color:'rgba(0,255,178,0.8)', fontFamily:"'Inter',sans-serif" }}>✅ pagou</span>
+          <AnimHArrow color="#00FFB2" width={14} />
+          {n('payment-received')}
+          <AnimHArrow color="#FFD70066" width={12} />
+          {n('installment')}
+        </div>
+
+        {/* Not paid — arrow flows straight down into the reserve section */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginTop:10 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,76,76,0.8)', fontFamily:"'Inter',sans-serif", marginBottom:4 }}>❌ não pagou</div>
+          <AnimVArrow color="#FF4C4C" height={30} />
         </div>
 
         <SectionLabel color="#6366F1" text="Reserva / Fechado" />

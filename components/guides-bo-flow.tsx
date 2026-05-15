@@ -424,26 +424,32 @@ function FlowMap({ sel, onSel }:{ sel:string|null; onSel:(id:string, el:HTMLDivE
           </div>
         </div>
 
-        {/* Paid exits — horizontal row from Payment Control */}
-        <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:6 }}>
-          <span style={{ fontSize:11, fontWeight:700, color:'rgba(0,255,178,0.8)', fontFamily:"'Inter',sans-serif" }}>✅ pagou</span>
-          <AnimHArrow color="#00FFB2" width={14} />
-          {n('payment-received')}
-          <AnimHArrow color="#FFD70066" width={12} />
-          {n('installment')}
+        {/* ── Fork from Payment Control ─────────────────────────────── */}
+
+        {/* 2 green arrows → paid statuses */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginTop:6 }}>
+          <div style={{ fontSize:12, fontWeight:700, color:'rgba(0,255,178,0.85)', fontFamily:"'Inter',sans-serif", marginBottom:8 }}>✅ pagou</div>
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <AnimHArrow color="#00FFB2" width={20} />
+            {n('payment-received')}
+            <AnimHArrow color="#00FFB299" width={20} />
+            {n('installment')}
+          </div>
         </div>
 
-        {/* Not paid — arrow flows straight down into the reserve section */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginTop:10 }}>
-          <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,76,76,0.8)', fontFamily:"'Inter',sans-serif", marginBottom:4 }}>❌ não pagou</div>
-          <AnimVArrow color="#FF4C4C" height={30} />
-        </div>
+        <div style={{ height:18 }} />
 
-        <SectionLabel color="#6366F1" text="Reserva / Fechado" />
-        <div style={{ display:'flex', gap:10, flexWrap:'wrap', justifyContent:'center' }}>
-          {n('reserve-grads')}
-          {n('reserve-prol')}
-          {n('closed')}
+        {/* 3 red arrows → reserve / closed statuses */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+          <div style={{ fontSize:12, fontWeight:700, color:'rgba(255,76,76,0.85)', fontFamily:"'Inter',sans-serif", marginBottom:8 }}>❌ não pagou</div>
+          <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap', justifyContent:'center' }}>
+            <AnimHArrow color="#FF4C4C" width={20} />
+            {n('reserve-grads')}
+            <AnimHArrow color="#FF4C4C99" width={20} />
+            {n('reserve-prol')}
+            <AnimHArrow color="#FF4C4C77" width={20} />
+            {n('closed')}
+          </div>
         </div>
 
         {/* Special statuses separator */}

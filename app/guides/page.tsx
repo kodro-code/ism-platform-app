@@ -464,7 +464,7 @@ export default function GuidesPage() {
         {/* Landing — shown when no section selected */}
         {!section && (
           <div style={{ position:'relative', padding:'48px 40px', maxWidth:760, fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
-            <DiamondBg bright />
+            <DiamondBg />
             <div style={{ position:'relative', zIndex:1 }}>
             <div style={{ marginBottom:40 }}>
               <div style={{ fontSize:12, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8, fontFamily:"'Inter',sans-serif" }}>Guides</div>
@@ -475,7 +475,7 @@ export default function GuidesPage() {
                 Selecione uma secção no menu lateral ou clique num card para começar.
               </p>
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))', gap:16 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
               {GUIDE_CARDS.map((card, i) => (
                 <div
                   key={card.id}

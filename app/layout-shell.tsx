@@ -30,8 +30,9 @@ const NAV: NavItem[] = [
     id: 'tools', label: 'Tools', route: '/tools',
     children: [
       { id: 'minha-area',  label: 'Minha Área',           icon: '📊', route: '/minha-area',       desc: 'Relatório mensal de performance pessoal' },
-      { id: 'soporte',     label: 'Suporte Técnico',       icon: '🎫', route: '/soporte',          desc: 'Abra um ticket de suporte técnico' },
-      { id: 'calculadora', label: 'Calculadora de Preços', icon: '🧮', route: '/calculadora',      desc: 'Calcule preços, margens e impostos' },
+      { id: 'soporte',     label: 'Suporte Técnico',       icon: '🎫', route: '/soporte',               desc: 'Abra um ticket de suporte técnico' },
+      { id: 'comunicacao', label: 'CS & Teaching',            icon: '📨', route: '/tools/comunicacao',    desc: 'A quem acionar e quando abrir o formulário' },
+      { id: 'calculadora', label: 'Calculadora de Preços', icon: '🧮', route: '/calculadora',           desc: 'Calcule preços, margens e impostos' },
       { id: 'relatorio',   label: 'Relatório de Vendas',  icon: '📋', route: '/relatorio',        desc: 'Visualize e filtre vendas por período' },
       { id: 'cashback',    label: 'Gerador de Cashback',  icon: '💵', route: '/cashback',         desc: 'Gere links de cashback para clientes' },
       { id: 'turno',       label: 'Registro de Turno',    icon: '🕐', route: '/turno',            desc: 'Relatório de final de turno e solicitações' },

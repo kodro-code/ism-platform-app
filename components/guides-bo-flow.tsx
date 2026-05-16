@@ -304,50 +304,83 @@ function SNode({ id, sel, onSel, highlight }:{ id:string; sel:string|null; onSel
 
 // ── Detail Panel ──────────────────────────────────────────────────────────────
 function DetailPanel({ id, onClose }:{ id:string; onClose:()=>void }) {
-  const s = SM[id]; const [showObj, setShowObj] = useState(false)
+  const s = SM[id]
+  const [showObj, setShowObj] = useState(false)
+  const typeLabel = ({ entry:'Entrada', active:'Ativo', 'final-paid':'Pago ✓', 'final-reserve':'Reserva', 'final-closed':'Fechado', special:'Especial' } as Record<string,string>)[s.type] ?? 'Especial'
   return (
-    <div style={{ width:286, flexShrink:0, background:'rgba(8,10,18,0.99)', border:`1px solid ${s.color}30`, borderRadius:14, display:'flex', flexDirection:'column', overflow:'hidden', animation:'koddySlide 0.2s ease-out' }}>
-      <div style={{ padding:'13px 15px', background:`${s.color}0e`, borderBottom:`1px solid ${s.color}20`, display:'flex', alignItems:'flex-start', gap:8 }}>
-        <div style={{ flex:1 }}>
-          <div style={{ fontSize:9, fontWeight:700, color:s.color, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3, fontFamily:"'Inter',sans-serif" }}>Status</div>
+    <div style={{
+      width:316,
+      background:'rgba(7,9,15,0.97)',
+      border:`1.5px solid ${s.color}28`,
+      borderRadius:16,
+      overflow:'hidden',
+      boxShadow:`0 0 0 1px ${s.color}0c, 0 28px 64px rgba(0,0,0,0.85)`,
+    }}>
+      {/* Header */}
+      <div style={{
+        padding:'14px 16px',
+        background:`linear-gradient(135deg, ${s.color}10 0%, transparent 100%)`,
+        borderBottom:`1px solid ${s.color}1c`,
+        display:'flex', alignItems:'center', gap:12,
+      }}>
+        <div style={{
+          width:42, height:42, borderRadius:11, flexShrink:0,
+          background:s.bg, border:`1.5px solid ${s.color}40`,
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:22,
+        }}>{STATUS_ICONS[id]}</div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{
+            display:'inline-block', marginBottom:4,
+            fontSize:8.5, fontWeight:700, color:s.color,
+            textTransform:'uppercase', letterSpacing:'0.1em',
+            fontFamily:"'Inter',sans-serif",
+            padding:'2px 8px', borderRadius:5,
+            background:`${s.color}14`, border:`1px solid ${s.color}22`,
+          }}>{typeLabel}</div>
           <div style={{ fontSize:14, fontWeight:800, color:'#E8EDF5', fontFamily:"'Inter',sans-serif", lineHeight:1.2 }}>{s.label}</div>
         </div>
-        <button onClick={onClose} style={{ background:'none', border:'none', color:'rgba(232,237,245,0.3)', cursor:'pointer', fontSize:18, lineHeight:1, padding:'0 2px' }}>×</button>
+        <button onClick={onClose} style={{
+          background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)',
+          color:'rgba(232,237,245,0.5)', cursor:'pointer', fontSize:15, lineHeight:1,
+          padding:'6px 9px', borderRadius:8, flexShrink:0,
+        }}>×</button>
       </div>
-      <div style={{ flex:1, overflowY:'auto', padding:'13px 15px', display:'flex', flexDirection:'column', gap:12 }}>
+      {/* Scrollable content */}
+      <div style={{ overflowY:'auto', maxHeight:'63vh', padding:'14px 16px', display:'flex', flexDirection:'column', gap:13 }}>
         <div>
-          <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(232,237,245,0.3)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>O que significa</div>
-          <div style={{ fontSize:12, color:'rgba(232,237,245,0.72)', fontFamily:"'DM Sans',sans-serif", lineHeight:1.65 }}>{s.description}</div>
+          <div style={{ fontSize:9, fontWeight:700, color:'rgba(232,237,245,0.26)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:5, fontFamily:"'Inter',sans-serif" }}>O que significa</div>
+          <div style={{ fontSize:12.5, color:'rgba(232,237,245,0.72)', fontFamily:"'DM Sans',sans-serif", lineHeight:1.7 }}>{s.description}</div>
         </div>
         <div>
-          <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(232,237,245,0.3)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>Quando usar</div>
-          <div style={{ fontSize:12, color:'rgba(232,237,245,0.72)', fontFamily:"'DM Sans',sans-serif", lineHeight:1.65 }}>{s.whenToUse}</div>
+          <div style={{ fontSize:9, fontWeight:700, color:'rgba(232,237,245,0.26)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:5, fontFamily:"'Inter',sans-serif" }}>Quando usar</div>
+          <div style={{ fontSize:12.5, color:'rgba(232,237,245,0.72)', fontFamily:"'DM Sans',sans-serif", lineHeight:1.7 }}>{s.whenToUse}</div>
         </div>
         {s.action && (
-          <div style={{ background:'rgba(167,139,250,0.08)', border:'1px solid rgba(167,139,250,0.28)', borderRadius:10, padding:'10px 12px' }}>
-            <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(167,139,250,0.7)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>⚡ Ação</div>
+          <div style={{ background:'rgba(167,139,250,0.07)', border:'1px solid rgba(167,139,250,0.2)', borderRadius:11, padding:'12px 13px' }}>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(167,139,250,0.65)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>⚡ Ação</div>
             <div style={{ fontSize:13, fontWeight:800, color:'#C4B5FD', fontFamily:"'Inter',sans-serif" }}>{s.action}</div>
           </div>
         )}
         {s.type !== 'entry' && s.type !== 'special' && (
-          <div style={{ background:'rgba(0,255,178,0.06)', border:'1px solid rgba(0,255,178,0.18)', borderRadius:10, padding:'10px 12px' }}>
-            <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(0,255,178,0.55)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>⚡ Task a criar</div>
+          <div style={{ background:'rgba(0,255,178,0.05)', border:'1px solid rgba(0,255,178,0.15)', borderRadius:11, padding:'12px 13px' }}>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(0,255,178,0.5)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:4, fontFamily:"'Inter',sans-serif" }}>⚡ Task a criar</div>
             <div style={{ fontSize:13, fontWeight:800, color:'#00FFB2', fontFamily:"'Inter',sans-serif" }}>{s.task}</div>
-            <div style={{ fontSize:10.5, color:'rgba(232,237,245,0.3)', fontFamily:"'DM Sans',sans-serif", marginTop:3 }}>Nome da Task = nome do Status</div>
+            <div style={{ fontSize:10, color:'rgba(232,237,245,0.28)', fontFamily:"'DM Sans',sans-serif", marginTop:3 }}>Nome da Task = nome do Status</div>
           </div>
         )}
         {s.hasObjection && (
           <div>
-            <button onClick={()=>setShowObj(o=>!o)} style={{ width:'100%', background:'rgba(255,23,68,0.07)', border:'1px solid rgba(255,23,68,0.18)', borderRadius:10, padding:'10px 12px', cursor:'pointer', textAlign:'left' }}>
-              <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(255,76,76,0.7)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:3, fontFamily:"'Inter',sans-serif" }}>⚠️ O BO pede objeção</div>
-              <div style={{ fontSize:11.5, color:'rgba(232,237,245,0.45)', fontFamily:"'DM Sans',sans-serif", display:'flex', justifyContent:'space-between' }}>
-                Janela automática ao salvar <span>{showObj?'▲':'▼'}</span>
+            <button onClick={()=>setShowObj(o=>!o)} style={{ width:'100%', background:'rgba(255,23,68,0.06)', border:'1px solid rgba(255,23,68,0.16)', borderRadius:11, padding:'11px 13px', cursor:'pointer', textAlign:'left', display:'block' }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,76,76,0.65)', textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:3, fontFamily:"'Inter',sans-serif" }}>⚠️ O BO pede objeção</div>
+              <div style={{ fontSize:11, color:'rgba(232,237,245,0.4)', fontFamily:"'DM Sans',sans-serif", display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                Janela automática ao salvar <span style={{ fontSize:9 }}>{showObj?'▲':'▼'}</span>
               </div>
             </button>
             {showObj && (
-              <div style={{ marginTop:6, background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:10, padding:'10px 12px', display:'flex', flexDirection:'column', gap:2 }}>
+              <div style={{ marginTop:6, background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.05)', borderRadius:10, padding:'10px 13px', display:'flex', flexDirection:'column', gap:2 }}>
                 {OBJECTIONS.map((o,i)=>(
-                  <div key={i} style={{ fontSize:11, color:'rgba(232,237,245,0.45)', fontFamily:"'DM Sans',sans-serif", padding:'3px 0', borderBottom:i<OBJECTIONS.length-1?'1px solid rgba(255,255,255,0.04)':'none' }}>{o}</div>
+                  <div key={i} style={{ fontSize:11, color:'rgba(232,237,245,0.42)', fontFamily:"'DM Sans',sans-serif", padding:'3px 0', borderBottom:i<OBJECTIONS.length-1?'1px solid rgba(255,255,255,0.04)':'none' }}>{o}</div>
                 ))}
               </div>
             )}
@@ -355,10 +388,10 @@ function DetailPanel({ id, onClose }:{ id:string; onClose:()=>void }) {
         )}
         {s.nextIds.length > 0 && (
           <div>
-            <div style={{ fontSize:9.5, fontWeight:700, color:'rgba(232,237,245,0.3)', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:6, fontFamily:"'Inter',sans-serif" }}>Pode mover para</div>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(232,237,245,0.26)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:7, fontFamily:"'Inter',sans-serif" }}>Pode mover para</div>
             <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
               {s.nextIds.map(nid=>{ const ns=SM[nid]; if(!ns) return null; return (
-                <div key={nid} style={{ padding:'3px 8px', borderRadius:6, background:ns.bg, border:`1px solid ${ns.color}33`, fontSize:10.5, fontWeight:600, color:ns.color, fontFamily:"'Inter',sans-serif" }}>{ns.label}</div>
+                <div key={nid} style={{ padding:'4px 9px', borderRadius:7, background:ns.bg, border:`1px solid ${ns.color}30`, fontSize:10.5, fontWeight:600, color:ns.color, fontFamily:"'Inter',sans-serif" }}>{ns.label}</div>
               )})}
             </div>
           </div>
@@ -426,52 +459,63 @@ function FlowMap({ sel, onSel }:{ sel:string|null; onSel:(id:string, el:HTMLDivE
         <AnimVArrow color="#00FFB2" height={22} />
         {n('payment-control')}
 
-        {/* ── 5 exits from Payment Control — crossbar + drops ─────── */}
+        {/* ── 5 exits from Payment Control — animated crossbar + drops ── */}
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-          {/* Vertical stem connecting from Payment Control box */}
-          <div style={{ width:2, height:14, background:'rgba(34,197,94,0.5)' }} />
-          {/* Crossbar spanning all 5 exits, with solid colored drops */}
+          {/* Animated stem from Payment Control */}
+          <div style={{ width:2, height:14, overflow:'hidden', position:'relative' }}>
+            <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, rgba(34,197,94,0.8) 0px, rgba(34,197,94,0.8) 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+          </div>
+          {/* Labels above crossbar — widths match their column groups */}
+          <div style={{ display:'inline-flex', gap:10, paddingBottom:4 }}>
+            <div style={{ width:290, textAlign:'center', fontSize:9, fontWeight:700, color:'rgba(0,255,178,0.75)', fontFamily:"'Inter',sans-serif" }}>✅ pagou</div>
+            <div style={{ width:440, textAlign:'center', fontSize:9, fontWeight:700, color:'rgba(255,76,76,0.75)', fontFamily:"'Inter',sans-serif" }}>❌ não pagou</div>
+          </div>
+          {/* Crossbar + animated drops — no divider */}
           <div style={{ position:'relative', display:'inline-flex', gap:10, alignItems:'flex-start' }}>
-            {/* Horizontal crossbar line */}
-            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'rgba(255,255,255,0.16)', borderRadius:1 }} />
+            {/* Animated crossbar: left/right inset 70px so it ends exactly at the outermost drop centers */}
+            <div style={{ position:'absolute', top:0, left:70, right:70, height:2, overflow:'hidden' }}>
+              <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to right, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 4px, transparent 4px, transparent 8px)', backgroundSize:'16px 2px', animation:'arrowFlowRight 0.5s linear infinite' }} />
+            </div>
             {/* ✅ Payment Received */}
             <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-              <div style={{ width:2, height:20, background:'#00FFB2' }} />
+              <div style={{ width:2, height:20, overflow:'hidden', position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, #00FFB2 0px, #00FFB2 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+              </div>
               <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #00FFB2' }} />
               {n('payment-received')}
             </div>
             {/* ✅ Installment */}
             <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-              <div style={{ width:2, height:20, background:'#00FFB299' }} />
+              <div style={{ width:2, height:20, overflow:'hidden', position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, #00FFB299 0px, #00FFB299 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+              </div>
               <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #00FFB299' }} />
               {n('installment')}
             </div>
-            {/* Divider between paid / not paid */}
-            <div style={{ width:1, alignSelf:'stretch', background:'rgba(255,255,255,0.09)', margin:'0 4px' }} />
             {/* ❌ Reserve Grads */}
             <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-              <div style={{ width:2, height:20, background:'#FF4C4C' }} />
+              <div style={{ width:2, height:20, overflow:'hidden', position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, #FF4C4C 0px, #FF4C4C 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+              </div>
               <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4C' }} />
               {n('reserve-grads')}
             </div>
             {/* ❌ Reserve Prol */}
             <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-              <div style={{ width:2, height:20, background:'#FF4C4CCC' }} />
+              <div style={{ width:2, height:20, overflow:'hidden', position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, #FF4C4CCC 0px, #FF4C4CCC 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+              </div>
               <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4CCC' }} />
               {n('reserve-prol')}
             </div>
             {/* ❌ Closed */}
             <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-              <div style={{ width:2, height:20, background:'#FF4C4C88' }} />
+              <div style={{ width:2, height:20, overflow:'hidden', position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(to bottom, #FF4C4C88 0px, #FF4C4C88 5px, transparent 5px, transparent 10px)', backgroundSize:'2px 20px', animation:'arrowFlowDown 0.5s linear infinite' }} />
+              </div>
               <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4C88' }} />
               {n('closed')}
             </div>
-          </div>
-          {/* Legend */}
-          <div style={{ display:'flex', gap:16, marginTop:8, alignItems:'center' }}>
-            <div style={{ fontSize:9, fontWeight:700, color:'rgba(0,255,178,0.65)', fontFamily:"'Inter',sans-serif" }}>✅ pagou</div>
-            <div style={{ width:1, height:10, background:'rgba(255,255,255,0.08)' }} />
-            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,76,76,0.65)', fontFamily:"'Inter',sans-serif" }}>❌ não pagou</div>
           </div>
         </div>
 
@@ -684,59 +728,28 @@ function LeadJourney() {
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
-const LEFT_NODES        = new Set(['callback', 'ngt', 'na5'])
-const FORCE_RIGHT_NODES = new Set(['reserve-grads','reserve-prol','closed','payment-received','installment','freeze','temporary','subscription-reactivation'])
-
 export default function BOFlowView() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [selStatus, setSelStatus] = useState<string|null>(null)
-  const [panel, setPanel] = useState<{
-    x:number; y:number
-    connL:number; connW:number; connY:number
-    tailOff:number; side:'left'|'right'
-  }|null>(null)
+  const [panelPos, setPanelPos] = useState<{ x:number; y:number }|null>(null)
 
-  function clearSel() { setSelStatus(null); setPanel(null) }
+  function clearSel() { setSelStatus(null); setPanelPos(null) }
 
   function handleNodeSelect(id: string, el: HTMLDivElement | null) {
     if (!id || id === selStatus) { clearSel(); return }
     setSelStatus(id)
-    if (!el || !scrollRef.current) return
-
-    const nr  = el.getBoundingClientRect()
-    const cr  = scrollRef.current.getBoundingClientRect()
-    const st  = scrollRef.current.scrollTop
-    const cw  = scrollRef.current.clientWidth
-
-    const nodeTop   = nr.top   - cr.top  + st
-    const nodeLeft  = nr.left  - cr.left
-    const nodeRight = nr.right - cr.left
-    const nodeMidY  = nodeTop  + nr.height / 2
-
-    const PW = 286, GAP = 16
-    let side: 'left'|'right'
-    let px: number
-
-    if (FORCE_RIGHT_NODES.has(id)) {
-      // Always place in the far-right margin so panel never overlaps adjacent nodes
-      side = 'right'
-      px = Math.max(nodeRight + GAP, cw - PW - 8)
-    } else if (LEFT_NODES.has(id)) {
-      side = 'left'
-      px = nodeLeft - PW - GAP
-      if (px < 8) { side = 'right'; px = nodeRight + GAP }
-    } else {
-      side = 'right'
-      px = nodeRight + GAP
-      if (px + PW + 8 > cw) { side = 'left'; px = Math.max(8, nodeLeft - PW - GAP) }
-    }
-
-    const connL   = side === 'left' ? px + PW    : nodeRight
-    const connW   = side === 'left' ? nodeLeft - (px + PW) : px - nodeRight
-    const py      = Math.max(8, nodeMidY - 30)
-    const tailOff = Math.max(10, nodeMidY - py)
-
-    setPanel({ x:px, y:py, connL, connW:Math.max(0, connW), connY:nodeMidY, tailOff, side })
+    if (!el) return
+    const nr = el.getBoundingClientRect()
+    const PW = 316, GAP = 12
+    const vw = window.innerWidth, vh = window.innerHeight
+    // Place right of node; fall back to left if it would overflow the viewport
+    const px = (nr.right + GAP + PW + 8 <= vw)
+      ? nr.right + GAP
+      : Math.max(8, nr.left - PW - GAP)
+    // Vertically center panel on the node, clamped to viewport
+    const nodeMidY = nr.top + nr.height / 2
+    const py = Math.max(16, Math.min(vh - 480, nodeMidY - 160))
+    setPanelPos({ x: px, y: py })
   }
 
   return (
@@ -760,7 +773,7 @@ export default function BOFlowView() {
         }
       `}</style>
 
-      <div ref={scrollRef} style={{ height:'100%', overflowY:'auto', padding:'28px 28px 64px', position:'relative' }} onClick={() => { if (panel) clearSel() }}>
+      <div ref={scrollRef} style={{ height:'100%', overflowY:'auto', padding:'28px 28px 64px', position:'relative' }} onClick={() => { if (panelPos) clearSel() }}>
 
         <div style={{ marginBottom:24 }}>
           <div style={{ fontSize:11, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:5, fontFamily:"'Inter',sans-serif" }}>Guia · BO</div>
@@ -773,43 +786,15 @@ export default function BOFlowView() {
 
         <LeadJourney />
 
-        {/* Animated connector — spans gap between node and panel */}
-        {selStatus && SM[selStatus] && panel && panel.connW > 2 && (
-          <div style={{
-            position:'absolute', left:panel.connL, top:panel.connY - 1,
-            width:panel.connW, height:2, overflow:'hidden',
-            zIndex:199, pointerEvents:'none',
-          }}>
-            <div style={{
-              position:'absolute', inset:0,
-              background:`repeating-linear-gradient(to right, ${SM[selStatus].color}66 0px, ${SM[selStatus].color}66 4px, transparent 4px, transparent 8px)`,
-              backgroundSize:'16px 2px',
-              animation:'arrowFlowRight 0.5s linear infinite',
-            }}/>
+        {/* Detail panel — fixed, adjacent to the clicked node */}
+        {selStatus && SM[selStatus] && panelPos && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ position:'fixed', left:panelPos.x, top:panelPos.y, zIndex:500, animation:'cloudIn 0.2s ease-out both' }}
+          >
+            <DetailPanel id={selStatus} onClose={clearSel} />
           </div>
         )}
-
-        {/* Panel — absolutely positioned so it stays anchored to the node when scrolling */}
-        {selStatus && SM[selStatus] && panel && (() => {
-          const s = SM[selStatus]
-          return (
-            <div onClick={(e) => e.stopPropagation()} style={{ position:'absolute', left:panel.x, top:panel.y, zIndex:200, width:286, animation:'cloudIn 0.3s ease-out 0.06s both', filter:'drop-shadow(0 12px 40px rgba(0,0,0,0.6))' }}>
-              <div style={{ position:'relative' }}>
-                {/* Speech-bubble tail pointing toward the node */}
-                <div style={{
-                  position:'absolute',
-                  top: panel.tailOff - 7,
-                  borderTop:'7px solid transparent',
-                  borderBottom:'7px solid transparent',
-                  ...(panel.side === 'right'
-                    ? { left:-9, borderRight:`9px solid ${s.color}33` }
-                    : { right:-9, borderLeft:`9px solid ${s.color}33` }),
-                }}/>
-                <DetailPanel id={selStatus} onClose={clearSel} />
-              </div>
-            </div>
-          )
-        })()}
 
       </div>
     </div>

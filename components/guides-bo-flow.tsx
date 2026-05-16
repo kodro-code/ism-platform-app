@@ -412,43 +412,66 @@ function FlowMap({ sel, onSel }:{ sel:string|null; onSel:(id:string, el:HTMLDivE
           <div style={{ width:36, display:'flex', alignItems:'flex-start', paddingTop:30 }}>
             <div style={{ width:36, height:1.5, background:'rgba(255,255,255,0.08)', marginTop:16 }}/>
           </div>
-          {/* Right branch: closing funnel — ends at Payment Control */}
+          {/* Right branch: closing funnel — ends at Negotiation */}
           <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
             {n('followup')}
             <AnimVArrow color="#00E5FF" height={22} />
             {n('waiting')}
             <AnimVArrow color="#00C2FF" height={22} />
             {n('negotiation')}
-            <AnimVArrow color="#00FFB2" height={22} />
-            {n('payment-control')}
           </div>
         </div>
 
-        {/* ── Fork from Payment Control ─────────────────────────────── */}
+        {/* Payment Control — centered, receives all funneled leads */}
+        <AnimVArrow color="#00FFB2" height={22} />
+        {n('payment-control')}
 
-        {/* 2 green arrows → paid statuses */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginTop:6 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:'rgba(0,255,178,0.85)', fontFamily:"'Inter',sans-serif", marginBottom:8 }}>✅ pagou</div>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <AnimHArrow color="#00FFB2" width={20} />
-            {n('payment-received')}
-            <AnimHArrow color="#00FFB299" width={20} />
-            {n('installment')}
-          </div>
-        </div>
-
-        <div style={{ height:18 }} />
-
-        {/* 3 red arrows → reserve / closed statuses */}
+        {/* ── 5 exits from Payment Control — crossbar + drops ─────── */}
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-          <div style={{ fontSize:12, fontWeight:700, color:'rgba(255,76,76,0.85)', fontFamily:"'Inter',sans-serif", marginBottom:8 }}>❌ não pagou</div>
-          <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap', justifyContent:'center' }}>
-            <AnimHArrow color="#FF4C4C" width={20} />
-            {n('reserve-grads')}
-            <AnimHArrow color="#FF4C4C99" width={20} />
-            {n('reserve-prol')}
-            <AnimHArrow color="#FF4C4C77" width={20} />
-            {n('closed')}
+          {/* Vertical stem connecting from Payment Control box */}
+          <div style={{ width:2, height:14, background:'rgba(34,197,94,0.5)' }} />
+          {/* Crossbar spanning all 5 exits, with solid colored drops */}
+          <div style={{ position:'relative', display:'inline-flex', gap:10, alignItems:'flex-start' }}>
+            {/* Horizontal crossbar line */}
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'rgba(255,255,255,0.16)', borderRadius:1 }} />
+            {/* ✅ Payment Received */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <div style={{ width:2, height:20, background:'#00FFB2' }} />
+              <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #00FFB2' }} />
+              {n('payment-received')}
+            </div>
+            {/* ✅ Installment */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <div style={{ width:2, height:20, background:'#00FFB299' }} />
+              <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #00FFB299' }} />
+              {n('installment')}
+            </div>
+            {/* Divider between paid / not paid */}
+            <div style={{ width:1, alignSelf:'stretch', background:'rgba(255,255,255,0.09)', margin:'0 4px' }} />
+            {/* ❌ Reserve Grads */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <div style={{ width:2, height:20, background:'#FF4C4C' }} />
+              <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4C' }} />
+              {n('reserve-grads')}
+            </div>
+            {/* ❌ Reserve Prol */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <div style={{ width:2, height:20, background:'#FF4C4CCC' }} />
+              <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4CCC' }} />
+              {n('reserve-prol')}
+            </div>
+            {/* ❌ Closed */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <div style={{ width:2, height:20, background:'#FF4C4C88' }} />
+              <div style={{ width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'7px solid #FF4C4C88' }} />
+              {n('closed')}
+            </div>
+          </div>
+          {/* Legend */}
+          <div style={{ display:'flex', gap:16, marginTop:8, alignItems:'center' }}>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(0,255,178,0.65)', fontFamily:"'Inter',sans-serif" }}>✅ pagou</div>
+            <div style={{ width:1, height:10, background:'rgba(255,255,255,0.08)' }} />
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,76,76,0.65)', fontFamily:"'Inter',sans-serif" }}>❌ não pagou</div>
           </div>
         </div>
 

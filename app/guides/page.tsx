@@ -337,6 +337,15 @@ const GUIDE_CARDS = [
     glow: 'rgba(0,255,178,0.2)',
     accent: '#00FFB2',
   },
+  {
+    id: 'bo-flow' as Section,
+    icon: '🗺️',
+    label: 'Fluxo de Trabalho BO',
+    desc: 'Mapa completo de statuses do BO — quando usar, tasks a criar e fluxo de leads.',
+    color: 'rgba(0,194,255,0.10)',
+    glow: 'rgba(0,194,255,0.22)',
+    accent: '#00C2FF',
+  },
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -455,7 +464,7 @@ export default function GuidesPage() {
         {/* Landing — shown when no section selected */}
         {!section && (
           <div style={{ position:'relative', padding:'48px 40px', maxWidth:760, fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
-            <DiamondBg />
+            <DiamondBg bright />
             <div style={{ position:'relative', zIndex:1 }}>
             <div style={{ marginBottom:40 }}>
               <div style={{ fontSize:12, fontWeight:700, color:'var(--accent)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8, fontFamily:"'Inter',sans-serif" }}>Guides</div>

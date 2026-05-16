@@ -11,11 +11,24 @@ const GEMS = Array.from({ length: 18 }, (_, i) => ({
   dy:   (i % 2 === 0 ? -1 : 1) * (6 + (i % 4) * 5),
 }))
 
-export default function DiamondBg() {
+const GEMS_BRIGHT = Array.from({ length: 22 }, (_, i) => ({
+  x:    +((i * 137.508 + 11) % 100).toFixed(1),
+  y:    +((i * 83.21  + i * 1.3) % 100).toFixed(1),
+  size: 10 + (i % 4) * 6,
+  op:   0.13 + (i % 5) * 0.06,
+  dur:  `${6 + (i % 5) * 2}s`,
+  del:  `${(i % 7) * -2}s`,
+  hue:  i % 3 === 0 ? '#00FFB2' : i % 3 === 1 ? '#00C2FF' : '#9D8FFF',
+  dx:   (i % 2 === 0 ? 1 : -1) * (12 + (i % 3) * 8),
+  dy:   (i % 2 === 0 ? -1 : 1) * (10 + (i % 4) * 7),
+}))
+
+export default function DiamondBg({ bright }: { bright?: boolean }) {
+  const gems = bright ? GEMS_BRIGHT : GEMS
   return (
     <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none', zIndex:0 }}>
       <style>{`
-        ${GEMS.map((g, i) => `
+        ${gems.map((g, i) => `
           @keyframes dfloat${i} {
             0%   { transform: translate(0,0)        rotate(0deg)   }
             33%  { transform: translate(${g.dx}px,${g.dy}px) rotate(45deg)  }
@@ -24,7 +37,7 @@ export default function DiamondBg() {
           }
         `).join('')}
       `}</style>
-      {GEMS.map((g, i) => {
+      {gems.map((g, i) => {
         const h = g.size, c = g.size / 2
         return (
           <svg

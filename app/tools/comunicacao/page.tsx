@@ -2,7 +2,7 @@
 
 export default function ComunicacaoPage() {
   return (
-    <div style={{ padding:'36px 40px 64px', fontFamily:"'Inter',sans-serif", maxWidth:1100 }}>
+    <div style={{ padding:'36px 40px 64px', fontFamily:"'Inter',sans-serif", maxWidth:1100, margin:'0 auto' }}>
 
       {/* ── Header ── */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, marginBottom:28, flexWrap:'wrap' }}>
@@ -30,6 +30,17 @@ export default function ComunicacaoPage() {
 
         {/* ── Teaching column ── */}
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          <FlowSteps
+            id="teaching" title="Fluxo — Teaching"
+            color="#5AB4CC" colorRgb="90,180,204" dim="#3A7A90"
+            bgCard="#0C1C26" borderCard="#1A4A60"
+            steps={[
+              { icon:'🔍', label:'Identifica o caso' },
+              { icon:'💬', label:'Envia no canal' },
+              { icon:'🏷️', label:'Marca o TL' },
+              { icon:'⏳', label:'Aguarda confirmação' },
+            ]}
+          />
           <div style={{ borderRadius:14, background:'#0C1C26', border:'1.5px solid #1A4A60', display:'flex', flexDirection:'column', flex:1 }}>
             <div style={{ padding:'18px 20px 14px', borderBottom:'1px solid #143850' }}>
               <div style={{ fontSize:11, fontWeight:700, color:'#3A7A90', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Canal — Teaching</div>
@@ -72,21 +83,21 @@ export default function ComunicacaoPage() {
               </div>
             </div>
           </div>
-          <FlowSteps
-            id="teaching" title="Fluxo — Teaching"
-            color="#5AB4CC" colorRgb="90,180,204" dim="#3A7A90"
-            bgCard="#0C1C26" borderCard="#1A4A60"
-            steps={[
-              { icon:'🔍', label:'Identifica o caso' },
-              { icon:'💬', label:'Envia no canal' },
-              { icon:'🏷️', label:'Marca o TL' },
-              { icon:'⏳', label:'Aguarda confirmação' },
-            ]}
-          />
         </div>
 
         {/* ── CS-ISM column ── */}
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          <FlowSteps
+            id="cs" title="Fluxo — CS-ISM"
+            color="#CC7848" colorRgb="204,120,72" dim="#885030"
+            bgCard="#1C1008" borderCard="#4A2A10"
+            steps={[
+              { icon:'📋', label:'Preenche o formulário' },
+              { icon:'💬', label:'Envia no canal' },
+              { icon:'🏷️', label:'Marca o responsável' },
+              { icon:'⏳', label:'Aguarda resposta do CS' },
+            ]}
+          />
           <div style={{ borderRadius:14, background:'#1C1008', border:'1.5px solid #4A2A10', display:'flex', flexDirection:'column', flex:1 }}>
             <div style={{ padding:'18px 20px 14px', borderBottom:'1px solid #38200C' }}>
               <div style={{ fontSize:11, fontWeight:700, color:'#885030', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Canal — CS-ISM</div>
@@ -130,17 +141,6 @@ export default function ComunicacaoPage() {
               </div>
             </div>
           </div>
-          <FlowSteps
-            id="cs" title="Fluxo — CS-ISM"
-            color="#CC7848" colorRgb="204,120,72" dim="#885030"
-            bgCard="#1C1008" borderCard="#4A2A10"
-            steps={[
-              { icon:'📋', label:'Preenche o formulário' },
-              { icon:'💬', label:'Envia no canal' },
-              { icon:'🏷️', label:'Marca o responsável' },
-              { icon:'⏳', label:'Aguarda resposta do CS' },
-            ]}
-          />
         </div>
 
       </div>

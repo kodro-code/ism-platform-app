@@ -4,6 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import KoddyWidget from '@/components/koddy-widget';
+import { COURSES, CATEGORIES } from '@/data/courses';
+
+const CAT_COLOR: Record<string, string> = {
+  coding: '#00C2FF',
+  design: '#A855F7',
+}
 
 function UserAvatar({ name, fileId }: { name: string; photoUrl: string; fileId: string }) {
   const [err, setErr] = useState(false);
@@ -31,7 +37,7 @@ const NAV: NavItem[] = [
     children: [
       { id: 'minha-area',  label: 'Minha Área',           icon: '📊', route: '/minha-area',       desc: 'Relatório mensal de performance pessoal' },
       { id: 'soporte',     label: 'Suporte Técnico',       icon: '🎫', route: '/soporte',               desc: 'Abra um ticket de suporte técnico' },
-      { id: 'comunicacao', label: 'CS & Teaching',            icon: '📨', route: '/tools/comunicacao',    desc: 'A quem acionar e quando abrir o formulário' },
+      { id: 'comunicacao', label: 'CS / Teaching',             icon: '📨', route: '/tools/comunicacao',    desc: 'A quem acionar e quando abrir o formulário' },
       { id: 'calculadora', label: 'Calculadora de Preços', icon: '🧮', route: '/calculadora',           desc: 'Calcule preços, margens e impostos' },
       { id: 'relatorio',   label: 'Relatório de Vendas',  icon: '📋', route: '/relatorio',        desc: 'Visualize e filtre vendas por período' },
       { id: 'cashback',    label: 'Gerador de Cashback',  icon: '💵', route: '/cashback',         desc: 'Gere links de cashback para clientes' },
@@ -41,7 +47,7 @@ const NAV: NavItem[] = [
   },
   {
     id: 'courses', label: 'Courses', route: '/courses',
-    children: [],
+    children: COURSES.map(c => ({ id: c.slug, label: c.name, icon: c.icon, route: `/courses/${c.slug}`, desc: '' })),
   },
   {
     id: 'direction', label: 'Direction', route: '/direction',
@@ -49,6 +55,7 @@ const NAV: NavItem[] = [
       { id: 'brasil',            label: 'LX Presentation',         icon: '📊', route: '/direction/brasil',      desc: 'Apresentação para a equipe LX' },
       { id: 'dir-indicacoes',    label: 'Indicações',              icon: '🔗', route: '/direction/indicacoes',  desc: 'Painel de indicações de todos os managers' },
       { id: 'perf-managers',     label: 'Performance per Manager', icon: '📈', route: '/minha-area',            desc: 'Relatório de performance de todos os managers' },
+      { id: 'salarios',          label: 'Salary Approval',         icon: '💳', route: '/direction/salarios',    desc: 'Aprovação de salários e histórico por manager' },
     ],
   },
 ];
@@ -336,8 +343,78 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           </div>
 
           {/* Sidebar items */}
-          <div style={{ flex:1, overflowY:'auto', padding:'10px 8px' }}>
-            {activeSidebarItem?.children && activeSidebarItem.children.length > 0 ? (
+          <div style={{ flex:1, overflowY:'auto', padding: openSidebar === 'courses' ? '8px 0' : '10px 8px' }}>
+            {openSidebar === 'courses' ? (
+              <>
+                {/* Todos os cursos */}
+                <button
+                  onClick={() => router.push('/courses')}
+                  style={{
+                    display:'flex', alignItems:'center', gap:9,
+                    width:'100%', padding:'11px 14px',
+                    background: pathname === '/courses' ? 'rgba(0,255,178,0.06)' : 'transparent',
+                    borderLeft:`3px solid ${pathname === '/courses' ? '#00FFB2' : 'transparent'}`,
+                    borderTop:'none', borderRight:'none',
+                    borderBottom:'1px solid rgba(255,255,255,0.05)',
+                    color: pathname === '/courses' ? '#00FFB2' : 'rgba(232,237,245,0.5)',
+                    cursor:'pointer', fontSize:12.5, fontWeight: pathname === '/courses' ? 700 : 400,
+                    fontFamily:"'Inter',sans-serif", textAlign:'left',
+                    transition:'all 0.15s', marginBottom:4,
+                  }}
+                  onMouseEnter={e => { if (pathname !== '/courses') { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = 'rgba(232,237,245,0.8)'; }}}
+                  onMouseLeave={e => { if (pathname !== '/courses') { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(232,237,245,0.5)'; }}}
+                >
+                  <span style={{ fontSize:15 }}>📚</span>
+                  Todos os Cursos
+                </button>
+
+                {/* Category groups */}
+                {CATEGORIES.map(cat => {
+                  const cc = CAT_COLOR[cat.id] ?? '#00C2FF';
+                  const catCourses = COURSES.filter(c => c.category === cat.id);
+                  return (
+                    <div key={cat.id}>
+                      <div style={{ padding:'10px 14px 4px', display:'flex', alignItems:'center', gap:5 }}>
+                        <div style={{ width:3, height:9, borderRadius:1.5, background:cc, flexShrink:0 }} />
+                        <span style={{ fontSize:9, fontWeight:800, color:`${cc}90`, letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Inter',sans-serif" }}>
+                          {cat.label}
+                        </span>
+                      </div>
+
+                      {catCourses.map(course => {
+                        const isCoursePage = pathname === `/courses/${course.slug}` || pathname.startsWith(`/courses/${course.slug}/`);
+                        return (
+                          <div
+                            key={course.slug}
+                            onClick={() => router.push(`/courses/${course.slug}`)}
+                            style={{
+                              display:'flex', alignItems:'center', gap:9,
+                              padding:'7px 12px 7px 0', cursor:'pointer',
+                              background: isCoursePage ? `${cc}0D` : 'transparent',
+                              borderLeft:`3px solid ${isCoursePage ? cc : 'transparent'}`,
+                              color: isCoursePage ? 'rgba(232,237,245,0.95)' : 'rgba(232,237,245,0.42)',
+                              transition:'all 0.13s', marginBottom:1,
+                            }}
+                            onMouseEnter={e => { if (!isCoursePage) { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(255,255,255,0.04)'; el.style.color = 'rgba(232,237,245,0.72)'; el.style.borderLeftColor = `${cc}40`; }}}
+                            onMouseLeave={e => { if (!isCoursePage) { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'rgba(232,237,245,0.42)'; el.style.borderLeftColor = 'transparent'; }}}
+                          >
+                            <span style={{ fontSize:15, paddingLeft:12, flexShrink:0 }}>{course.icon}</span>
+                            <span style={{ fontSize:12, fontWeight: isCoursePage ? 600 : 400, fontFamily:"'Inter',sans-serif", flex:1, minWidth:0, lineHeight:1.3 }}>
+                              {course.name}
+                              {(course.badge ?? (course.isNew ? 'NEW' : null)) && (
+                                <span style={{ marginLeft:5, fontSize:8, fontWeight:700, color:'#FF9640', verticalAlign:'middle' }}>{course.badge ?? 'NEW'}</span>
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
+
+                      <div style={{ height:1, background:'rgba(255,255,255,0.04)', margin:'5px 0' }} />
+                    </div>
+                  );
+                })}
+              </>
+            ) : activeSidebarItem?.children && activeSidebarItem.children.length > 0 ? (
               activeSidebarItem.children.map((child, i) => {
                 const childActive = pathname === child.route || pathname.startsWith(child.route + '/');
                 return (

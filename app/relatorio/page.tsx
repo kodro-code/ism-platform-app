@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 
+
 interface Venta { rowIndex: number; data: (string | number)[] }
 interface VentasResp { success: boolean; headers: string[]; data: Venta[] }
 
@@ -68,7 +69,7 @@ const arrow = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 function fst(focused: boolean, hasValue: boolean) {
   if (focused)  return { borderColor:'rgba(0,255,178,0.5)', boxShadow:'0 0 0 3px rgba(0,255,178,0.07)', background:'rgba(0,255,178,0.05)' };
   if (hasValue) return { borderColor:'rgba(0,255,178,0.25)', boxShadow:'none', background:'rgba(0,255,178,0.03)' };
-  return        { borderColor:'rgba(255,255,255,0.08)', boxShadow:'none', background:'rgba(6,9,14,0.8)' };
+  return        { borderColor:'rgba(255,255,255,0.08)', boxShadow:'none', background:'#06090E' };
 }
 
 function FI({ style, ...p }: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -104,7 +105,7 @@ function Section({ accent, icon, title, children }: {
         <span style={{ fontSize:12 }}>{icon}</span>
         <span style={{ fontSize:10.5, letterSpacing:'0.04em', textTransform:'uppercase', color:`${accent}CC`, fontFamily:"'Inter', sans-serif", fontWeight:700 }}>{title}</span>
       </div>
-      <div style={{ padding:'12px 14px', background:'rgba(12,16,22,0.8)', display:'flex', flexDirection:'column', gap:10 }}>
+      <div style={{ padding:'12px 14px', background:'#0B0F16', display:'flex', flexDirection:'column', gap:10 }}>
         {children}
       </div>
     </div>
@@ -185,7 +186,7 @@ function VentasSection({ ventas, ventaHeaders, loadingV, deletingRow, SHOW_COLS,
   const mesLabel = `${MONTH_PT[selMonth].slice(0,3)} ${selYear}`;
 
   return (
-    <div style={{ padding:'32px 28px 48px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ padding:'32px 28px 48px', borderTop:'1px solid rgba(255,255,255,0.06)', position:'relative', zIndex:1, background:'rgba(6,9,14,0.85)' }}>
 
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
@@ -424,13 +425,13 @@ export default function Relatorio() {
 
   // ── layout ────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display:'flex', flexDirection:'column', minHeight:'calc(100vh - 73px)' }}>
+    <div style={{ display:'flex', flexDirection:'column', minHeight:'calc(100vh - 73px)', position:'relative' }}>
 
     {/* ── FORM + PREVIEW ── */}
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', height:'calc(100vh - 73px)', overflow:'hidden' }}>
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', height:'calc(100vh - 73px)', overflow:'hidden', position:'relative', zIndex:1 }}>
 
       {/* ── LEFT ── */}
-      <form onSubmit={submit} style={{ padding:'20px 28px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto' }}>
+      <form onSubmit={submit} style={{ padding:'20px 28px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto', background:'rgba(6,9,14,0.72)', backdropFilter:'blur(2px)' }}>
 
         {/* progress header — reemplaza el título duplicado */}
         <div style={{ flexShrink:0 }}>
@@ -530,7 +531,7 @@ export default function Relatorio() {
       </form>
 
       {/* ── RIGHT — preview ── */}
-      <div style={{ borderLeft:'1px solid rgba(255,255,255,0.05)', background:'rgba(8,11,16,0.95)', padding:'20px 18px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto' }}>
+      <div style={{ borderLeft:'1px solid rgba(255,255,255,0.07)', background:'#080B10', padding:'20px 18px', display:'flex', flexDirection:'column', gap:10, overflowY:'auto' }}>
 
         <div style={{ fontSize:9.5, letterSpacing:'0.04em', textTransform:'uppercase', color:'rgba(232,237,245,0.18)', fontFamily:"'Inter', sans-serif", flexShrink:0 }}>— Preview em tempo real</div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
+
 type ReqType = '' | 'report' | 'extra'
 type ExtraT  = '' | 'dayChange' | 'extraHours'
 type Status  = 'idle' | 'loading' | 'success' | 'error'
@@ -334,12 +335,6 @@ export default function TurnoPage() {
   return (
     <div style={{ padding: hasPanel ? '32px 28px 64px' : '52px 28px 64px', display:'grid', gridTemplateColumns: hasPanel ? '1fr 400px' : '1fr', gap:28, alignItems:'start', position:'relative' }}>
 
-      {/* ── Background decoration ── */}
-      <div style={{ position:'fixed', inset:0, pointerEvents:'none', zIndex:0, overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'8%', right:'12%', width:560, height:560, borderRadius:'50%', background:'radial-gradient(circle, rgba(180,126,255,0.055) 0%, transparent 68%)', animation:'orbitPulse 14s ease-in-out infinite' }} />
-        <div style={{ position:'absolute', bottom:'15%', left:'6%', width:420, height:420, borderRadius:'50%', background:'radial-gradient(circle, rgba(0,255,178,0.035) 0%, transparent 70%)', animation:'orbitPulse 19s ease-in-out infinite 4s' }} />
-        <div style={{ position:'absolute', top:'55%', left:'35%', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle, rgba(0,194,255,0.03) 0%, transparent 70%)', animation:'orbitPulse 11s ease-in-out infinite 2s' }} />
-      </div>
 
       {/* ── LEFT ── */}
       <div style={{ position:'relative', zIndex:1, maxWidth: hasPanel ? 'none' : 560, margin: hasPanel ? '0' : '0 auto', width:'100%' }}>

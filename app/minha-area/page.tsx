@@ -454,6 +454,189 @@ function ManagerPhotoCircle({ url, name, size = 60 }: { url: string; name: strin
   )
 }
 
+// ── Salary types ─────────────────────────────────────────────────────────────
+interface SalaryMonth {
+  key: string; label: string
+  fix: number; commission: number; bonus: number; fines: number; totalSalary: number
+  payments: any[]
+}
+interface MgrSalaryData {
+  name: string; email: string; photoUrl: string
+  payments: any[]; months: SalaryMonth[]
+}
+
+// ── Salary section ────────────────────────────────────────────────────────────
+function PayChip({ label, color, bold }: { label: string; color: string; bold?: boolean }) {
+  return (
+    <span style={{ padding: '2px 7px', borderRadius: 5, fontSize: 11, fontWeight: bold ? 700 : 400, color, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: "'Inter',sans-serif", whiteSpace: 'nowrap' }}>
+      {label}
+    </span>
+  )
+}
+
+function SalarySection({ salary }: { salary: MgrSalaryData }) {
+  const months = salary.months
+  if (!months || months.length === 0) return null
+
+  const hasComm  = months.some(m => m.commission > 0)
+  const hasSales = months.some(m => m.payments.some((p: any) => p.totalSales > 0))
+
+  function fmtC(v: number) {
+    if (v >= 10000) return '$' + (v / 1000).toFixed(1) + 'k'
+    if (v >= 1000)  return '$' + Math.round(v).toLocaleString('en-US')
+    return '$' + Math.round(v)
+  }
+  function fmtUSD2(v: number) {
+    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function SalSparkline({ months: ms, getValue, color, gradId, title }: {
+    months: SalaryMonth[]; getValue: (m: SalaryMonth) => number
+    color: string; gradId: string; title: string
+  }) {
+    const W = 560, H = 240, PL = 22, PR = 22, PT = 56, PB = 34
+    const innerW = W - PL - PR
+    const innerH = H - PT - PB
+    const dotR = 5, dotRL = 8
+    const fVal = 20, fMonth = 15
+    const vals    = ms.map(getValue)
+    const maxV    = Math.max(...vals, 1) * 1.22
+    const xOf     = (i: number) => PL + (ms.length > 1 ? (i / (ms.length - 1)) * innerW : innerW / 2)
+    const yOf     = (v: number) => PT + innerH * (1 - v / maxV)
+    const linePath = ms.map((m, i) => `${i === 0 ? 'M' : 'L'}${xOf(i).toFixed(1)},${yOf(getValue(m)).toFixed(1)}`).join(' ')
+    const anchor  = (i: number) => i === 0 ? 'start' : i === ms.length - 1 ? 'end' : 'middle'
+
+    return (
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 9, fontWeight: 700, color: `${color}60`, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: "'Inter',sans-serif", marginBottom: 6, textAlign: 'center' }}>{title}</div>
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', overflow: 'visible' }}>
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.14} />
+              <stop offset="100%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          {[0.33, 0.66, 1].map(t => (
+            <line key={t} x1={PL} y1={PT + innerH * (1 - t)} x2={W - PR} y2={PT + innerH * (1 - t)}
+              stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
+          ))}
+          <path d={`${linePath} L${xOf(ms.length - 1).toFixed(1)},${(PT + innerH).toFixed(1)} L${xOf(0).toFixed(1)},${(PT + innerH).toFixed(1)} Z`} fill={`url(#${gradId})`} />
+          <path d={linePath} fill="none" stroke={color} strokeWidth={1.8} strokeOpacity={0.65} strokeLinejoin="round" strokeLinecap="round" />
+          {ms.map((m, i) => {
+            const v    = getValue(m)
+            const px   = xOf(i), py = yOf(v)
+            const anc  = anchor(i)
+            const isCur = i === ms.length - 1
+            const lbl  = m.label.split(' ')[0].slice(0, 3)
+            return (
+              <g key={i}>
+                {isCur && <circle cx={px} cy={py} r={dotRL + 6} fill={color} opacity={0.1} />}
+                <circle cx={px} cy={py} r={isCur ? dotRL : dotR}
+                  fill={isCur ? color : `${color}70`}
+                  style={isCur ? { filter: `drop-shadow(0 0 7px ${color}99)` } : {}} />
+                {isCur && (
+                  <>
+                    <circle cx={px} cy={py} r={dotRL + 3} fill="none" stroke={color} strokeWidth={1.5}>
+                      <animate attributeName="r" values={`${dotRL + 3};${dotRL + 22}`} dur="2.2s" repeatCount="indefinite" />
+                      <animate attributeName="stroke-opacity" values="0.6;0" dur="2.2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx={px} cy={py} r={dotRL + 3} fill="none" stroke={color} strokeWidth={1}>
+                      <animate attributeName="r" values={`${dotRL + 3};${dotRL + 30}`} dur="2.2s" begin="0.55s" repeatCount="indefinite" />
+                      <animate attributeName="stroke-opacity" values="0.35;0" dur="2.2s" begin="0.55s" repeatCount="indefinite" />
+                    </circle>
+                  </>
+                )}
+                {v > 0 && (
+                  <text x={px} y={py - 16} textAnchor={anc} fontSize={fVal} fontWeight={isCur ? 800 : 500}
+                    fill={isCur ? color : `${color}BB`} fontFamily="'Inter',sans-serif"
+                    paintOrder="stroke fill" stroke="rgba(9,13,20,0.85)" strokeWidth={5} strokeLinejoin="round">
+                    {fmtC(v)}
+                  </text>
+                )}
+                <text x={px} y={H - 4} textAnchor={anc} fontSize={fMonth}
+                  fill={isCur ? 'rgba(232,237,245,0.6)' : 'rgba(232,237,245,0.25)'}
+                  fontFamily="'DM Sans',sans-serif">{lbl}</text>
+              </g>
+            )
+          })}
+        </svg>
+      </div>
+    )
+  }
+
+  const monthsDesc = [...months].reverse()
+
+  return (
+    <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ fontSize: 9.5, fontWeight: 700, color: 'rgba(0,255,178,0.45)', letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: "'Inter',sans-serif", marginBottom: 16 }}>Histórico de Salário</div>
+
+      {/* Charts row */}
+      {months.length >= 2 && (
+        <div style={{ display: 'flex', gap: 14, marginBottom: 28 }}>
+          <SalSparkline months={months} getValue={m => m.totalSalary} color="#00FFB2" gradId="ss-sal" title="Salário Total" />
+          {hasComm && <SalSparkline months={months} getValue={m => m.commission} color="#00C2FF" gradId="ss-comm" title="Comissão" />}
+          {hasSales && <SalSparkline months={months} getValue={m => m.payments.reduce((a: number, p: any) => a + (p.totalSales || 0), 0)} color="#A855F7" gradId="ss-sales" title="Total Vendas" />}
+        </div>
+      )}
+
+      {/* Payment history — card format grouped by month */}
+      <div style={{ fontSize: 9.5, fontWeight: 700, color: 'rgba(232,237,245,0.2)', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Inter',sans-serif", marginBottom: 12 }}>Histórico de Pagamentos</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {monthsDesc.map((mon, mi) => {
+          const allPaid = mon.payments.length > 0 && mon.payments.every((p: any) => {
+            const a = String(p.approved || '').trim().toLowerCase()
+            return a === 'paid' || a === 'pago' || a === 'approved'
+          })
+          const isLatest = mi === 0
+          return (
+            <div key={mon.key} style={{ borderRadius: 10, border: `1px solid ${isLatest ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`, overflow: 'hidden' }}>
+              {/* Month header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'rgba(255,255,255,0.025)' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(232,237,245,0.85)', fontFamily: "'Inter',sans-serif" }}>{mon.label}</span>
+                <span style={{ fontSize: 11, color: 'rgba(232,237,245,0.3)', fontFamily: "'Inter',sans-serif" }}>· {fmtUSD2(mon.totalSalary)}</span>
+                <div style={{ flex: 1 }} />
+                {allPaid && (
+                  <span style={{ padding: '2px 7px', borderRadius: 4, fontSize: 9.5, fontWeight: 700, color: '#00FFB2', background: 'rgba(0,255,178,0.1)', border: '1px solid rgba(0,255,178,0.25)', fontFamily: "'Inter',sans-serif" }}>APPROVED</span>
+                )}
+              </div>
+              {/* Individual payments */}
+              {mon.payments.map((p: any, pi: number) => {
+                const approved = String(p.approved || '').trim()
+                const aLow = approved.toLowerCase()
+                const isPaid = aLow === 'paid' || aLow === 'pago' || aLow === 'approved'
+                const isPending = !approved || aLow === 'pending'
+                const isUpcoming = aLow === 'upcoming'
+                const statusColor = isPaid ? '#00FFB2' : isPending ? '#FFB340' : isUpcoming ? 'rgba(232,237,245,0.4)' : '#FF5454'
+                const statusLabel = isPaid ? 'APPROVED' : isPending ? 'PENDING' : isUpcoming ? 'UPCOMING' : approved.toUpperCase()
+                const period = p.isClosing ? '16-end' : '1-15'
+                const pctLabel = p.pctComm > 0 ? (p.pctComm < 1 ? `${(p.pctComm * 100).toFixed(0)}%` : `${p.pctComm}%`) : ''
+                return (
+                  <div key={pi} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderTop: '1px solid rgba(255,255,255,0.04)', flexWrap: 'wrap' }}>
+                    <div style={{ minWidth: 110, flexShrink: 0 }}>
+                      <div style={{ fontSize: 11.5, color: 'rgba(232,237,245,0.6)', fontFamily: "'Inter',sans-serif", fontWeight: 500 }}>{p.date || p.dateRaw}</div>
+                      <div style={{ fontSize: 9.5, color: 'rgba(232,237,245,0.28)', fontFamily: "'DM Sans',sans-serif", marginTop: 1 }}>{mon.label.split(' ')[0]} {period}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', flex: 1 }}>
+                      {p.fix > 0        && <PayChip label={`Base: ${fmtUSD2(p.fix)}`}                                        color="rgba(232,237,245,0.6)" />}
+                      {p.totalSales > 0 && <PayChip label={`Sales: ${fmtUSD2(p.totalSales)}`}                                color="#A855F7" />}
+                      {p.commission > 0 && <PayChip label={`Comm${pctLabel ? ' ' + pctLabel : ''}: ${fmtUSD2(p.commission)}`} color="#00C2FF" />}
+                      {p.extraDays > 0  && <PayChip label={`Extra: ${fmtUSD2(p.extraDays)}`}                                 color="rgba(232,237,245,0.6)" />}
+                      {p.bonus > 0      && <PayChip label={`Bonus: ${fmtUSD2(p.bonus)}`}                                     color="#FFD700" />}
+                      {p.fines > 0      && <PayChip label={`Multas: -${fmtUSD2(p.fines)}`}                                   color="#FF5454" />}
+                      <PayChip label={`Total: ${fmtUSD2(p.totalSalary)}`} color="rgba(232,237,245,0.9)" bold />
+                    </div>
+                    <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 9.5, fontWeight: 700, color: statusColor, background: `${statusColor}18`, border: `1px solid ${statusColor}30`, whiteSpace: 'nowrap', flexShrink: 0, fontFamily: "'Inter',sans-serif" }}>{statusLabel}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Nav button style ──────────────────────────────────────────────────────────
 const navBtn: React.CSSProperties = {
   background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)',
@@ -464,10 +647,11 @@ const navBtn: React.CSSProperties = {
 // ═══════════════════════════════════════════════════════════════════════════════
 // DOCUMENT REPORT
 // ═══════════════════════════════════════════════════════════════════════════════
-function DocumentReport({ data, email, photoUrl, month, year, onPrev, onNext, isCurrentMonth, scoreHistory = [], salesHistory = [] }: {
+function DocumentReport({ data, email, photoUrl, month, year, onPrev, onNext, isCurrentMonth, scoreHistory = [], salesHistory = [], salary }: {
   data: MinhaAreaData; email?: string; photoUrl?: string; month: number; year: number
   onPrev: () => void; onNext: () => void; isCurrentMonth: boolean
   scoreHistory?: ScorePoint[]; salesHistory?: SalesPoint[]
+  salary?: MgrSalaryData | null
 }) {
   const rankMeta   = getRankMeta(data.rank)
   const effPct     = data.efficiency?.pct ?? 0
@@ -800,6 +984,9 @@ function DocumentReport({ data, email, photoUrl, month, year, onPrev, onNext, is
           </div>
         )}
 
+        {/* ── Salary history ────────────────────────────────────────────── */}
+        {salary && <SalarySection salary={salary} />}
+
       </div>
     </div>
   )
@@ -918,6 +1105,7 @@ export default function MinhaAreaPage() {
   const [adminScoreHistory, setAdminScoreHistory] = useState<ScorePoint[]>([])
   const [userSalesHistory,  setUserSalesHistory]  = useState<SalesPoint[]>([])
   const [adminSalesHistory, setAdminSalesHistory] = useState<SalesPoint[]>([])
+  const [userSalary,        setUserSalary]        = useState<MgrSalaryData | null>(null)
 
   useEffect(() => {
     if (isAdmin || sessionLoading) return
@@ -997,6 +1185,14 @@ export default function MinhaAreaPage() {
       .catch(() => {})
   }, [selectedManager])
 
+  useEffect(() => {
+    if (isAdmin || sessionLoading) return
+    fetch('/api/minha-area/salarios')
+      .then(r => r.json())
+      .then(d => { if (d && d.email) setUserSalary(d) })
+      .catch(() => {})
+  }, [isAdmin, sessionLoading])
+
   function prevMonth() {
     if (month === 1) { setMonth(12); setYear(y => y - 1) } else setMonth(m => m - 1)
   }
@@ -1055,6 +1251,7 @@ export default function MinhaAreaPage() {
                   month={month} year={year}
                   onPrev={prevMonth} onNext={nextMonth} isCurrentMonth={isCurrentMonth}
                   scoreHistory={userScoreHistory} salesHistory={userSalesHistory}
+                  salary={userSalary}
                 />
               : null
       )}

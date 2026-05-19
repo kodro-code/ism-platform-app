@@ -17,9 +17,9 @@ export default function ComunicacaoPage() {
         <a
           href="https://docs.google.com/forms/d/e/1FAIpQLSf9sg4N3M_qMMZaVN1yCYYZrHS0RWMRlkZsmYIQcRsyYtcI1g/viewform"
           target="_blank" rel="noreferrer"
-          style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'11px 22px', borderRadius:10, background:'rgba(204,120,72,0.1)', border:'1.5px solid rgba(204,120,72,0.3)', color:'#CC7848', fontSize:13.5, fontWeight:700, textDecoration:'none', whiteSpace:'nowrap' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background='rgba(204,120,72,0.18)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background='rgba(204,120,72,0.1)' }}
+          style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'11px 22px', borderRadius:10, background:'rgba(192,136,152,0.1)', border:'1.5px solid rgba(192,136,152,0.3)', color:'#C08898', fontSize:13.5, fontWeight:700, textDecoration:'none', whiteSpace:'nowrap' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background='rgba(192,136,152,0.18)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background='rgba(192,136,152,0.1)' }}
         >
           📋 Abrir Formulário CS-ISM ↗
         </a>
@@ -89,8 +89,8 @@ export default function ComunicacaoPage() {
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           <FlowSteps
             id="cs" title="Fluxo — CS-ISM"
-            color="#CC7848" colorRgb="204,120,72" dim="#885030"
-            bgCard="#1C1008" borderCard="#4A2A10"
+            color="#C08898" colorRgb="192,136,152" dim="#806070"
+            bgCard="#1A1418" borderCard="#4A3040"
             steps={[
               { icon:'📋', label:'Preenche o formulário' },
               { icon:'💬', label:'Envia no canal' },
@@ -98,15 +98,15 @@ export default function ComunicacaoPage() {
               { icon:'⏳', label:'Aguarda resposta do CS' },
             ]}
           />
-          <div style={{ borderRadius:14, background:'#1C1008', border:'1.5px solid #4A2A10', display:'flex', flexDirection:'column', flex:1 }}>
-            <div style={{ padding:'18px 20px 14px', borderBottom:'1px solid #38200C' }}>
-              <div style={{ fontSize:11, fontWeight:700, color:'#885030', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Canal — CS-ISM</div>
-              <div style={{ fontSize:19, fontWeight:800, color:'#CC7848' }}>#brasil-cs-ism</div>
-              <div style={{ fontSize:12.5, color:'#885030', marginTop:3 }}>Criar o ticket no formulário ANTES de solicitar no Slack</div>
+          <div style={{ borderRadius:14, background:'#1A1418', border:'1.5px solid #4A3040', display:'flex', flexDirection:'column', flex:1 }}>
+            <div style={{ padding:'18px 20px 14px', borderBottom:'1px solid #3C2430' }}>
+              <div style={{ fontSize:11, fontWeight:700, color:'#806070', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Canal — CS-ISM</div>
+              <div style={{ fontSize:19, fontWeight:800, color:'#C08898' }}>#brasil-cs-ism</div>
+              <div style={{ fontSize:12.5, color:'#806070', marginTop:3 }}>Criar o ticket no formulário ANTES de solicitar no Slack</div>
             </div>
             <div style={{ padding:'16px 20px', display:'flex', flexDirection:'column', gap:14, flex:1 }}>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:11, fontWeight:700, color:'#885030', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Quando usar — e quem mencionar</div>
+                <div style={{ fontSize:11, fontWeight:700, color:'#806070', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Quando usar — e quem mencionar</div>
                 <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
                   {[
                     ['Alteração de turma / horário',        'Samantha'],
@@ -116,26 +116,26 @@ export default function ComunicacaoPage() {
                     ['Informar cliente sobre data adiada',  'Samantha'],
                     ['Aviso de tutor ausente',               'Samantha'],
                   ].map(([caso, pessoa], i) => (
-                    <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, padding:'7px 10px', borderRadius:7, background:'#140C04' }}>
+                    <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, padding:'7px 10px', borderRadius:7, background:'#180E10' }}>
                       <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                        <span style={{ color:'#A86038', fontSize:11, flexShrink:0 }}>◆</span>
-                        <span style={{ fontSize:13, color:'#C09068', lineHeight:1.4 }}>{caso}</span>
+                        <span style={{ color:'#906070', fontSize:11, flexShrink:0 }}>◆</span>
+                        <span style={{ fontSize:13, color:'#B89098', lineHeight:1.4 }}>{caso}</span>
                       </div>
-                      <span style={{ fontSize:11.5, fontWeight:700, color:'#CC7848', whiteSpace:'nowrap', flexShrink:0 }}>@{pessoa}</span>
+                      <span style={{ fontSize:11.5, fontWeight:700, color:'#C08898', whiteSpace:'nowrap', flexShrink:0 }}>@{pessoa}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize:11, fontWeight:700, color:'#885030', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Modelo de mensagem</div>
-                <div style={{ background:'#0E0804', border:'1px solid #38200C', borderRadius:10, padding:'14px 16px' }}>
-                  <div style={{ fontSize:11.5, fontWeight:600, color:'#885030', marginBottom:9 }}>🧑 Você no #brasil-cs-ism</div>
-                  <div style={{ fontSize:13, color:'#C09870', lineHeight:1.9, borderLeft:'3px solid #A86038', paddingLeft:12 }}>
-                    <strong style={{ color:'#CC7848' }}>@[pessoa responsável]</strong> boa noite!<br/>
-                    Por favor, poderia realizar <em style={{ color:'#DEC0A0' }}>[a solicitação]</em> para o aluno <em style={{ color:'#DEC0A0' }}>[nome]</em>?<br/>
-                    <em style={{ color:'#806048', fontSize:12.5 }}>Situação: [descreva o contexto brevemente]</em><br/>
+                <div style={{ fontSize:11, fontWeight:700, color:'#806070', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Modelo de mensagem</div>
+                <div style={{ background:'#100A0C', border:'1px solid #3C2430', borderRadius:10, padding:'14px 16px' }}>
+                  <div style={{ fontSize:11.5, fontWeight:600, color:'#806070', marginBottom:9 }}>🧑 Você no #brasil-cs-ism</div>
+                  <div style={{ fontSize:13, color:'#B89098', lineHeight:1.9, borderLeft:'3px solid #906070', paddingLeft:12 }}>
+                    <strong style={{ color:'#C08898' }}>@[pessoa responsável]</strong> boa noite!<br/>
+                    Por favor, poderia realizar <em style={{ color:'#D0B8BC' }}>[a solicitação]</em> para o aluno <em style={{ color:'#D0B8BC' }}>[nome]</em>?<br/>
+                    <em style={{ color:'#806070', fontSize:12.5 }}>Situação: [descreva o contexto brevemente]</em><br/>
                     <span style={{ color:'#4A9E70', fontWeight:600 }}>✅ Formulário enviado</span><br/>
-                    <span style={{ color:'#503020', fontSize:12 }}>BO: <em>[link do backoffice do aluno]</em></span>
+                    <span style={{ color:'#402030', fontSize:12 }}>BO: <em>[link do backoffice do aluno]</em></span>
                   </div>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export default function ComunicacaoPage() {
           <thead>
             <tr style={{ background:'#080E18' }}>
               <th style={{ ...TH, textAlign:'left',   color:'#50687A', width:'36%' }}>Motivo</th>
-              <th style={{ ...TH, textAlign:'center', color:'#CC7848', width:'11%' }}>CS – ISM</th>
+              <th style={{ ...TH, textAlign:'center', color:'#C08898', width:'11%' }}>CS – ISM</th>
               <th style={{ ...TH, textAlign:'center', color:'#5AB4CC', width:'11%' }}>Teaching</th>
               <th style={{ ...TH, textAlign:'center', color:'#50687A', width:'26%' }}>Menção</th>
               <th style={{ ...TH, textAlign:'center', color:'#50687A', width:'16%' }}>Formulário</th>
@@ -178,7 +178,7 @@ export default function ComunicacaoPage() {
               <tr key={i} style={{ background: i%2===0 ? '#080E18' : '#0A1220', borderBottom: i<arr.length-1 ? '1px solid #101820' : 'none' }}>
                 <td style={{ padding:'11px 20px', fontSize:13, color:'#A8B8C8' }}>{row.m}</td>
                 <td style={{ padding:'11px', textAlign:'center' }}>
-                  {row.cs && <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', background:'#CC7848', opacity:0.85 }} />}
+                  {row.cs && <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', background:'#C08898', opacity:0.85 }} />}
                 </td>
                 <td style={{ padding:'11px', textAlign:'center' }}>
                   {row.t && <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', background:'#5AB4CC', opacity:0.85 }} />}

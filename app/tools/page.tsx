@@ -23,7 +23,7 @@ const ALL_ITEMS = [
   },
   {
     id: 'comunicacao',
-    icon: '📨', label: 'CS & Teaching',
+    icon: '📨', label: 'CS / Teaching',
     desc: 'A quem acionar e quando abrir o formulário — por motivo da solicitação.',
     route: '/tools/comunicacao',
     color: 'rgba(157,143,255,0.10)', glow: 'rgba(157,143,255,0.22)', accent: '#9D8FFF',

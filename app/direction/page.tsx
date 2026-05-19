@@ -28,6 +28,14 @@ const ITEMS = [
     color: 'rgba(0,255,178,0.10)',
     glow: 'rgba(0,255,178,0.2)',
   },
+  {
+    icon: '💳',
+    label: 'Salary Approval',
+    desc: 'Aprovação de pagamentos, histórico de salários e evolução por manager.',
+    route: '/direction/salarios',
+    color: 'rgba(245,166,35,0.10)',
+    glow: 'rgba(245,166,35,0.2)',
+  },
 ];
 
 export default function DirectionPage() {

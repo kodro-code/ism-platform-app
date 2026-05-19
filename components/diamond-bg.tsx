@@ -11,6 +11,19 @@ const GEMS = Array.from({ length: 18 }, (_, i) => ({
   dy:   (i % 2 === 0 ? -1 : 1) * (6 + (i % 4) * 5),
 }))
 
+// Medium: more visible and faster than default, less chaotic than bright
+const GEMS_MEDIUM = Array.from({ length: 20 }, (_, i) => ({
+  x:    +((i * 137.508 + 11) % 100).toFixed(1),
+  y:    +((i * 83.21  + i * 1.3) % 100).toFixed(1),
+  size: 8 + (i % 4) * 5,
+  op:   0.07 + (i % 5) * 0.035,
+  dur:  `${8 + (i % 5) * 3}s`,
+  del:  `${(i % 7) * -2}s`,
+  hue:  i % 3 === 0 ? '#00FFB2' : i % 3 === 1 ? '#00C2FF' : '#9D8FFF',
+  dx:   (i % 2 === 0 ? 1 : -1) * (12 + (i % 3) * 7),
+  dy:   (i % 2 === 0 ? -1 : 1) * (10 + (i % 4) * 6),
+}))
+
 const GEMS_BRIGHT = Array.from({ length: 22 }, (_, i) => ({
   x:    +((i * 137.508 + 11) % 100).toFixed(1),
   y:    +((i * 83.21  + i * 1.3) % 100).toFixed(1),
@@ -23,8 +36,8 @@ const GEMS_BRIGHT = Array.from({ length: 22 }, (_, i) => ({
   dy:   (i % 2 === 0 ? -1 : 1) * (10 + (i % 4) * 7),
 }))
 
-export default function DiamondBg({ bright }: { bright?: boolean }) {
-  const gems = bright ? GEMS_BRIGHT : GEMS
+export default function DiamondBg({ bright, medium }: { bright?: boolean; medium?: boolean }) {
+  const gems = bright ? GEMS_BRIGHT : medium ? GEMS_MEDIUM : GEMS
   return (
     <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none', zIndex:0 }}>
       <style>{`

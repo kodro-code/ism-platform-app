@@ -153,6 +153,47 @@ function ClienteTab({ course }: { course: Course }) {
   )
 }
 
+// ── Tab: Conhece o Produto ────────────────────────────────────────────────────
+function ConheceProdutoTab({ course }: { course: Course }) {
+  if (!course.conheceProduto) return <ComingSoon tab="Conhece o Produto" />
+
+  const embedUrl = `https://docs.google.com/presentation/d/${course.conheceProduto}/embed?start=false&loop=false&rm=minimal`
+
+  return (
+    <div>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', gap: 10,
+        padding: '10px 14px', borderRadius: 8, marginBottom: 18,
+        background: 'rgba(168,85,247,0.07)', border: '1px solid rgba(168,85,247,0.22)',
+      }}>
+        <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>🔒</span>
+        <span style={{ fontSize: 11.5, color: 'rgba(200,160,255,0.85)', fontFamily: "'DM Sans',sans-serif", lineHeight: 1.55 }}>
+          <strong style={{ fontWeight: 700 }}>Uso interno — managers only.</strong> Esta apresentação é exclusiva para a equipe. Não compartilhar com clientes.
+        </span>
+      </div>
+
+      <div style={{
+        textAlign: 'center', fontSize: 13, color: 'rgba(232,237,245,0.5)',
+        marginBottom: 12, fontFamily: "'Inter',sans-serif", lineHeight: 1.6,
+        padding: '8px 14px', borderRadius: 8,
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        👆 Clique no <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado direito</strong> do slide para avançar &nbsp;·&nbsp; <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado esquerdo</strong> para voltar
+      </div>
+
+      <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.3)' }}>
+        <iframe
+          src={embedUrl}
+          width="100%"
+          height="560"
+          style={{ display: 'block', border: 'none' }}
+          allowFullScreen
+        />
+      </div>
+    </div>
+  )
+}
+
 // ── Course detail page ────────────────────────────────────────────────────────
 export default function CourseDetailPage({ params }: { params: { slug: string } }) {
   const router = useRouter()
@@ -177,7 +218,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
   function renderTabContent() {
     switch (activeTab) {
       case 'cliente':       return <ClienteTab course={course!} />
-      case 'conhece':       return <ComingSoon tab="Conhece o Produto" />
+      case 'conhece':       return <ConheceProdutoTab course={course!} />
       case 'oferta':        return <ComingSoon tab="Como Oferecer" />
       case 'experimental':  return <ComingSoon tab="Aula Experimental" />
       case 'webinars':      return <ComingSoon tab="Webinars" />

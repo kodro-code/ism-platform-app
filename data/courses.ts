@@ -489,6 +489,7 @@ export const COURSES: Course[] = [
     duration: '40 aulas',
     codeStatus: 'Em processo',
     codes: [],
+    conheceProduto: '1HW_IFeSN5bVh_ysqjyzGEpB8NbK3wtgg-hMbOnxf0p8',
     cliente: {
       pdfUrl: '1z9AsckHtrqceQ5jPITtDtcrsuNAyYe6Y',
       resumo: `🔘 ⛏️ Bem-vindos ao curso de "Minecraft Education Nivel 1: Crie seu mundo com código"! 🖱️
@@ -505,7 +506,6 @@ export const COURSES: Course[] = [
 🔹 Projeto final: Da ideia ao código — planejamento, funções, tratamento de eventos e apresentação para a turma e os pais.
 🌟 Um curso incrível que transforma criatividade em código e construções automatizadas no universo do Minecraft! ✨`,
     },
-    conheceProduto: null,
     comoOferir: null,
     classeExperimental: null,
     webinars: null,
@@ -524,6 +524,7 @@ export const COURSES: Course[] = [
     duration: '40 aulas',
     codeStatus: 'Em processo',
     codes: [],
+    conheceProduto: '1DuTUuMZIzbQ9OTqgLYD3VFY3x40FmzaNMI6Zft5gO7c',
     cliente: {
       pdfUrl: '1wNt5Y5Vpa-no2iJ67qFApKnTGIPbBpU1',
       resumo: `🔘 🐍 Bem-vindos ao curso de "Minecraft Education Nível 2: Criando programas em Python dentro do jogo!"! 🖱️
@@ -539,7 +540,6 @@ export const COURSES: Course[] = [
 🔹 Projeto final: Criação de um minijogo completo no Minecraft com temporizador, sistema de pontuação e apresentação para a turma.
 🌟 Um curso incrível que transforma alunos em verdadeiros programadores, escrevendo Python real dentro do universo do Minecraft! ✨`,
     },
-    conheceProduto: null,
     comoOferir: null,
     classeExperimental: null,
     webinars: null,

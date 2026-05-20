@@ -466,7 +466,9 @@ export const COURSES: Course[] = [
 🔹 Modelagem arquitetônica: Renderizações fotorrealistas de edifícios com iluminação profissional e texturas realistas.
 🔹 Inteligência Artificial: Uso de IA para gerar ideias, referências e esboços de personagens como um designer 3D real.
 🔹 Projeto de formatura: Desenvolvimento de um projeto original completo e montagem de portfólio profissional no Behance.
-🌟 Um curso completo que transforma adolescentes em criadores 3D profissionais, do primeiro bloco ao portfólio final! ✨`,
+🌟 Um curso completo que transforma adolescentes em criadores 3D profissionais, do primeiro bloco ao portfólio final! ✨
+📄 Conteúdo completo em PDF:
+👉 https://drive.google.com/file/d/1u4CQqku2shUpm3u7TCT17b79Sh0--5sm/view?usp=sharing`,
     },
     conheceProduto: null,
     comoOferir: null,
@@ -504,7 +506,9 @@ export const COURSES: Course[] = [
 🔹 Jogos e puzzles: Eventos, condições, variáveis e temporizadores para criar minijogos personalizados no MakeCode.
 🔹 Automação de fazendas: Agente jardineiro, separação de recursos, fazenda de mobs e armazenamento automatizado.
 🔹 Projeto final: Da ideia ao código — planejamento, funções, tratamento de eventos e apresentação para a turma e os pais.
-🌟 Um curso incrível que transforma criatividade em código e construções automatizadas no universo do Minecraft! ✨`,
+🌟 Um curso incrível que transforma criatividade em código e construções automatizadas no universo do Minecraft! ✨
+📄 Conteúdo completo em PDF:
+👉 https://drive.google.com/file/d/1z9AsckHtrqceQ5jPITtDtcrsuNAyYe6Y/view?usp=sharing`,
     },
     comoOferir: null,
     classeExperimental: null,
@@ -538,7 +542,9 @@ export const COURSES: Course[] = [
 🔹 Coordenadas e eventos: Eixos x, y e z, geração de paisagens aleatórias, teletransporte e reações aos movimentos do jogador.
 🔹 Inteligência Artificial: Como a IA funciona, ética no uso da tecnologia e como criar prompts eficientes para melhorar o código.
 🔹 Projeto final: Criação de um minijogo completo no Minecraft com temporizador, sistema de pontuação e apresentação para a turma.
-🌟 Um curso incrível que transforma alunos em verdadeiros programadores, escrevendo Python real dentro do universo do Minecraft! ✨`,
+🌟 Um curso incrível que transforma alunos em verdadeiros programadores, escrevendo Python real dentro do universo do Minecraft! ✨
+📄 Conteúdo completo em PDF:
+👉 https://drive.google.com/file/d/1wNt5Y5Vpa-no2iJ67qFApKnTGIPbBpU1/view?usp=sharing`,
     },
     comoOferir: null,
     classeExperimental: null,

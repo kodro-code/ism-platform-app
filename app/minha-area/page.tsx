@@ -1106,6 +1106,7 @@ export default function MinhaAreaPage() {
   const [userSalesHistory,  setUserSalesHistory]  = useState<SalesPoint[]>([])
   const [adminSalesHistory, setAdminSalesHistory] = useState<SalesPoint[]>([])
   const [userSalary,        setUserSalary]        = useState<MgrSalaryData | null>(null)
+  const [adminSalary,       setAdminSalary]       = useState<MgrSalaryData | null>(null)
 
   useEffect(() => {
     if (isAdmin || sessionLoading) return
@@ -1192,6 +1193,18 @@ export default function MinhaAreaPage() {
       .then(d => { if (d && d.email) setUserSalary(d) })
       .catch(() => {})
   }, [isAdmin, sessionLoading])
+
+  useEffect(() => {
+    if (!selectedManager) { setAdminSalary(null); return }
+    fetch('/api/direction/salarios')
+      .then(r => r.json())
+      .then((all: any[]) => {
+        if (!Array.isArray(all)) return
+        const mgr = all.find(m => String(m.email || '').toLowerCase() === selectedManager.email.toLowerCase())
+        setAdminSalary(mgr ?? null)
+      })
+      .catch(() => {})
+  }, [selectedManager])
 
   function prevMonth() {
     if (month === 1) { setMonth(12); setYear(y => y - 1) } else setMonth(m => m - 1)
@@ -1280,6 +1293,7 @@ export default function MinhaAreaPage() {
                         month={adminMonth} year={adminYear}
                         onPrev={adminPrevMonth} onNext={adminNextMonth} isCurrentMonth={adminIsCurrentMonth}
                         scoreHistory={adminScoreHistory} salesHistory={adminSalesHistory}
+                        salary={adminSalary}
                       />
                     : <div style={{ textAlign:'center', padding:'60px 0', color:'rgba(232,237,245,0.3)', fontSize:13 }}>Sem dados para este manager este mês</div>
                 }

@@ -608,7 +608,7 @@ function GastosView({ mgrs }: { mgrs: Manager[] }) {
   const activeSeries = CATS.filter(c => activeCats.includes(c.key))
   const allVals      = activeSeries.flatMap(s => sorted.map(m => (m as any)[s.key] as number || 0))
   const maxV         = Math.max(...allVals, 1)
-  const W = 760, H = 190, PL = 14, PR = 14, PT = 18, PB = 26
+  const W = 760, H = 130, PL = 14, PR = 14, PT = 14, PB = 22
   const cW = W - PL - PR, cH = H - PT - PB
   const xAt = (i: number) => PL + (i / Math.max(n - 1, 1)) * cW
   const yAt = (v: number) => PT + (1 - v / maxV) * cH
@@ -633,46 +633,46 @@ function GastosView({ mgrs }: { mgrs: Manager[] }) {
       </div>
 
       {/* Paid vs Upcoming split */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 28, alignItems: 'stretch' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'stretch' }}>
         {/* Already sent */}
-        <div style={{ flex: 1, background: 'rgba(0,255,178,0.05)', border: '1px solid rgba(0,255,178,0.2)', borderRadius: 14, padding: '18px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-            <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,255,178,0.15)', border: '1px solid rgba(0,255,178,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#00FFB2', flexShrink: 0 }}>✓</div>
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>Já enviado</span>
+        <div style={{ flex: 1, background: 'rgba(0,255,178,0.05)', border: '1px solid rgba(0,255,178,0.2)', borderRadius: 12, padding: '11px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <div style={{ width: 15, height: 15, borderRadius: '50%', background: 'rgba(0,255,178,0.15)', border: '1px solid rgba(0,255,178,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: '#00FFB2', flexShrink: 0 }}>✓</div>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>Already sent</span>
           </div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: '#00FFB2', fontFamily: "'Inter',sans-serif", marginBottom: 5 }}>${fmt(paidHalf.totalSalary)}</div>
-          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
+          <div style={{ fontSize: 21, fontWeight: 700, color: '#00FFB2', fontFamily: "'Inter',sans-serif", marginBottom: 3 }}>${fmt(paidHalf.totalSalary)}</div>
+          <div style={{ fontSize: 10, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
             {paidHalf.dates.length > 0 ? paidHalf.dates.sort().map(fmtPayDate).join(', ') : '—'}
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 22, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>+</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 18, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>+</div>
 
         {/* Upcoming */}
-        <div style={{ flex: 1, background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 14, padding: '18px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" style={{ flexShrink: 0 }}>
+        <div style={{ flex: 1, background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 12, padding: '11px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <svg width="13" height="13" viewBox="0 0 16 16" style={{ flexShrink: 0 }}>
               <circle cx="8" cy="8" r="8" fill="#F5A623" fillOpacity="0.15">
                 <animate attributeName="r" values="8;5;8" dur="1.8s" repeatCount="indefinite"/>
                 <animate attributeName="fillOpacity" values="0.15;0.4;0.15" dur="1.8s" repeatCount="indefinite"/>
               </circle>
               <circle cx="8" cy="8" r="4.5" fill="#F5A623"/>
             </svg>
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>A enviar</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>Upcoming</span>
           </div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: '#F5A623', fontFamily: "'Inter',sans-serif", marginBottom: 5 }}>${fmt(upcomingHalf.totalSalary)}</div>
-          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
-            {upcomingHalf.dates.length > 0 ? upcomingHalf.dates.sort().map(fmtPayDate).join(', ') : 'Mes completo ✓'}
+          <div style={{ fontSize: 21, fontWeight: 700, color: '#F5A623', fontFamily: "'Inter',sans-serif", marginBottom: 3 }}>${fmt(upcomingHalf.totalSalary)}</div>
+          <div style={{ fontSize: 10, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
+            {upcomingHalf.dates.length > 0 ? upcomingHalf.dates.sort().map(fmtPayDate).join(', ') : 'Month complete ✓'}
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 22, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>=</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 18, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>=</div>
 
         {/* Total */}
-        <div style={{ flex: 1, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, fontFamily: "'Inter',sans-serif" }}>Total estimado</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--text)', fontFamily: "'Inter',sans-serif" }}>${fmt(paidHalf.totalSalary + upcomingHalf.totalSalary)}</div>
-          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif", marginTop: 5 }}>{cur.label}</div>
+        <div style={{ flex: 1, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '11px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5, fontFamily: "'Inter',sans-serif" }}>Monthly total</div>
+          <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--text)', fontFamily: "'Inter',sans-serif" }}>${fmt(paidHalf.totalSalary + upcomingHalf.totalSalary)}</div>
+          <div style={{ fontSize: 10, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif", marginTop: 3 }}>{cur.label}</div>
         </div>
       </div>
 
@@ -733,35 +733,26 @@ function GastosView({ mgrs }: { mgrs: Manager[] }) {
               return (
                 <g key={s.key}>
                   <path d={ad} fill={`url(#gG-${s.key})`} />
-                  <path d={ld} fill="none" stroke={s.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={ld} fill="none" stroke={s.color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                   {data.map((v, i) => {
                     const isCur = i === curIdx
                     const cx = xAt(i), cy = yAt(v)
                     const labelAnchor = i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'
-                    const labelY = cy < PT + 22 ? cy + 20 : cy - 8
+                    const labelY = cy < PT + 18 ? cy + 16 : cy - 6
                     const fmtV = v >= 10000 ? `$${(v / 1000).toFixed(1)}k` : v >= 1000 ? `$${Math.round(v).toLocaleString('en-US')}` : `$${Math.round(v)}`
                     return (
                       <g key={i}>
-                        <text x={cx} y={labelY} textAnchor={labelAnchor} fontSize="11" fontWeight="700" fill={s.color} fontFamily="'Inter',sans-serif"
-                          stroke="#080B10" strokeWidth="3" strokeLinejoin="round" paintOrder="stroke fill">
+                        <text x={cx} y={labelY} textAnchor={labelAnchor} fontSize="9" fontWeight="500" fill={s.color} fontFamily="'Inter',sans-serif"
+                          stroke="#080B10" strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke fill">
                           {fmtV}
                         </text>
                         {isCur && (
-                          <>
-                            <circle cx={cx} cy={cy} r="6" fill={s.color} opacity="0">
-                              <animate attributeName="opacity" values="0;0.3;0" dur="1.6s" repeatCount="indefinite" />
-                            </circle>
-                            <circle cx={cx} cy={cy} r="4" fill="none" stroke={s.color} strokeWidth="2.5" opacity="0">
-                              <animate attributeName="r" values="4;30;30" dur="1.6s" repeatCount="indefinite" />
-                              <animate attributeName="opacity" values="1;0;0" dur="1.6s" repeatCount="indefinite" />
-                            </circle>
-                            <circle cx={cx} cy={cy} r="4" fill="none" stroke={s.color} strokeWidth="1.5" opacity="0">
-                              <animate attributeName="r" values="4;4;30;30" keyTimes="0;0.3;1;1" dur="1.6s" repeatCount="indefinite" />
-                              <animate attributeName="opacity" values="0;0.7;0;0" keyTimes="0;0.3;0.95;1" dur="1.6s" repeatCount="indefinite" />
-                            </circle>
-                          </>
+                          <circle cx={cx} cy={cy} r="5" fill="none" stroke={s.color} strokeWidth="1.5" opacity="0.5">
+                            <animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
+                          </circle>
                         )}
-                        <circle cx={cx} cy={cy} r={isCur ? 5 : 3.5} fill={s.color} stroke="#080B10" strokeWidth="1.5" />
+                        <circle cx={cx} cy={cy} r={isCur ? 4 : 2.5} fill={s.color} stroke="#080B10" strokeWidth="1.2" />
                       </g>
                     )
                   })}

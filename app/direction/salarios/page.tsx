@@ -15,7 +15,7 @@ type Month = {
 }
 type Manager = {
   name: string; email: string; rowStart: number
-  payments: Payment[]; months: Month[]; photoUrl?: string
+  payments: Payment[]; months: Month[]; photoUrl?: string; inactive?: boolean
 }
 
 /* ─── Constants ──────────────────────────────────────────────────── */
@@ -561,6 +561,37 @@ function GastosView({ mgrs }: { mgrs: Manager[] }) {
 
   const cur = aggMap[todayKey] ?? sorted[sorted.length - 1]
 
+  const fmtPayDate = (iso: string) => { const [,m,d] = iso.split('-'); return `${Number(m)}/${Number(d)}` }
+  type HalfTotals = { totalSalary: number; fix: number; commission: number; bonus: number; fines: number; dates: string[] }
+
+  // Group current-month payments by spreadsheet column; a col is "sent" when all its payments are processed
+  type ColGroup = { totalSalary: number; fix: number; commission: number; bonus: number; fines: number; date: string; allProcessed: boolean }
+  const colGroups: Record<number, ColGroup> = {}
+  mgrs.forEach(mgr => {
+    mgr.months.filter(mo => mo.key === todayKey).forEach(mo => {
+      mo.payments.forEach(p => {
+        if (!colGroups[p.col]) colGroups[p.col] = { totalSalary: 0, fix: 0, commission: 0, bonus: 0, fines: 0, date: p.dateRaw.slice(0, 10), allProcessed: true }
+        colGroups[p.col].totalSalary += p.totalSalary
+        colGroups[p.col].fix         += p.fix
+        colGroups[p.col].commission  += p.commission
+        colGroups[p.col].bonus       += p.bonus
+        colGroups[p.col].fines       += p.fines
+        if (needsAction(p)) colGroups[p.col].allProcessed = false
+      })
+    })
+  })
+  const paidHalf: HalfTotals     = { totalSalary: 0, fix: 0, commission: 0, bonus: 0, fines: 0, dates: [] }
+  const upcomingHalf: HalfTotals = { totalSalary: 0, fix: 0, commission: 0, bonus: 0, fines: 0, dates: [] }
+  Object.values(colGroups).forEach(cg => {
+    const half = cg.allProcessed ? paidHalf : upcomingHalf
+    half.totalSalary += cg.totalSalary
+    half.fix         += cg.fix
+    half.commission  += cg.commission
+    half.bonus       += cg.bonus
+    half.fines       += cg.fines
+    half.dates.push(cg.date)
+  })
+
   const CATS = [
     { key: 'totalSalary', label: 'Total salary', color: '#00FFB2', short: 'Total' },
     { key: 'fix',         label: 'Base pay',      color: '#E8EDF5', short: 'Base' },
@@ -598,6 +629,50 @@ function GastosView({ mgrs }: { mgrs: Manager[] }) {
             </svg>
             <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.08em', fontFamily: "'Inter',sans-serif" }}>LIVE</span>
           </div>
+        </div>
+      </div>
+
+      {/* Paid vs Upcoming split */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 28, alignItems: 'stretch' }}>
+        {/* Already sent */}
+        <div style={{ flex: 1, background: 'rgba(0,255,178,0.05)', border: '1px solid rgba(0,255,178,0.2)', borderRadius: 14, padding: '18px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+            <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,255,178,0.15)', border: '1px solid rgba(0,255,178,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#00FFB2', flexShrink: 0 }}>✓</div>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>Já enviado</span>
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: '#00FFB2', fontFamily: "'Inter',sans-serif", marginBottom: 5 }}>${fmt(paidHalf.totalSalary)}</div>
+          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
+            {paidHalf.dates.length > 0 ? paidHalf.dates.sort().map(fmtPayDate).join(', ') : '—'}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 22, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>+</div>
+
+        {/* Upcoming */}
+        <div style={{ flex: 1, background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.25)', borderRadius: 14, padding: '18px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" style={{ flexShrink: 0 }}>
+              <circle cx="8" cy="8" r="8" fill="#F5A623" fillOpacity="0.15">
+                <animate attributeName="r" values="8;5;8" dur="1.8s" repeatCount="indefinite"/>
+                <animate attributeName="fillOpacity" values="0.15;0.4;0.15" dur="1.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="8" cy="8" r="4.5" fill="#F5A623"/>
+            </svg>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Inter',sans-serif" }}>A enviar</span>
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: '#F5A623', fontFamily: "'Inter',sans-serif", marginBottom: 5 }}>${fmt(upcomingHalf.totalSalary)}</div>
+          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif" }}>
+            {upcomingHalf.dates.length > 0 ? upcomingHalf.dates.sort().map(fmtPayDate).join(', ') : 'Mes completo ✓'}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(232,237,245,0.2)', fontSize: 22, fontWeight: 300, padding: '0 2px', userSelect: 'none' }}>=</div>
+
+        {/* Total */}
+        <div style={{ flex: 1, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, fontFamily: "'Inter',sans-serif" }}>Total estimado</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--text)', fontFamily: "'Inter',sans-serif" }}>${fmt(paidHalf.totalSalary + upcomingHalf.totalSalary)}</div>
+          <div style={{ fontSize: 11, color: 'rgba(232,237,245,0.35)', fontFamily: "'Inter',sans-serif", marginTop: 5 }}>{cur.label}</div>
         </div>
       </div>
 
@@ -854,6 +929,7 @@ export default function SalariosPage() {
             All
           </button>
           {mgrs.map((mgr, i) => {
+            if (mgr.inactive) return null
             const hasPending = mgr.payments.some(p => p.col === nextQueueCol && needsAction(p))
             const isSel = sel === i
             return (
@@ -876,11 +952,11 @@ export default function SalariosPage() {
       {/* ── CONTENT ──────────────────────────────────────────────── */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {view === 'rankings'
-          ? <RankingsView mgrs={mgrs} />
+          ? <RankingsView mgrs={mgrs.filter(m => !m.inactive)} />
           : view === 'gastos'
           ? <GastosView mgrs={mgrs} />
           : sel === null
-            ? <QueueView mgrs={mgrs} nextQueueCol={nextQueueCol} gone={gone} saving={saving} onApprove={doApprove} onViewMgr={i => setSel(i)} />
+            ? <QueueView mgrs={mgrs.filter(m => !m.inactive)} nextQueueCol={nextQueueCol} gone={gone} saving={saving} onApprove={doApprove} onViewMgr={i => setSel(i)} />
             : <DetailView mgr={mgrs[sel]} mi={sel} onBack={() => setSel(null)} onApprove={doApprove} gone={gone} saving={saving} nextQueueCol={nextQueueCol} />
         }
       </div>

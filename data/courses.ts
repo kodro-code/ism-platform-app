@@ -27,7 +27,9 @@ export interface Course {
   codes: CourseCode[]
   // single variant → object, multiple variants (e.g. Roblox, FunTech) → array
   cliente: CourseVariant | CourseVariant[] | null
-  conheceProduto: string | null
+  conheceProduto: string | null  // legacy Slides embed (fallback)
+  slides?: string[]              // Drive PNG image IDs for carousel
+  video?: string                 // YouTube video ID (unlisted)
   comoOferir: string | null
   classeExperimental: string | null
   webinars: string | null
@@ -492,6 +494,20 @@ export const COURSES: Course[] = [
     codeStatus: 'Em processo',
     codes: [],
     conheceProduto: '1HW_IFeSN5bVh_ysqjyzGEpB8NbK3wtgg-hMbOnxf0p8',
+    video: '1XfxciJuQNZSP4Rn_0LmAL8zcVRbM5s0u',
+    slides: [
+      '/slides/minecraft-1/01.png',
+      '/slides/minecraft-1/02.png',
+      '/slides/minecraft-1/03.png',
+      '/slides/minecraft-1/04.png',
+      '/slides/minecraft-1/05.png',
+      '/slides/minecraft-1/06.png',
+      '/slides/minecraft-1/07.png',
+      '/slides/minecraft-1/08.png',
+      '/slides/minecraft-1/09.png',
+      '/slides/minecraft-1/10.png',
+      '/slides/minecraft-1/11.png',
+    ],
     cliente: {
       pdfUrl: '1z9AsckHtrqceQ5jPITtDtcrsuNAyYe6Y',
       resumo: `🔘 ⛏️ Bem-vindos ao curso de "Minecraft Education Nivel 1: Crie seu mundo com código"! 🖱️
@@ -529,6 +545,20 @@ export const COURSES: Course[] = [
     codeStatus: 'Em processo',
     codes: [],
     conheceProduto: '1DuTUuMZIzbQ9OTqgLYD3VFY3x40FmzaNMI6Zft5gO7c',
+    video: '19alRqQTdPiERHIPR8JpHggizg4EcKDhw',
+    slides: [
+      '/slides/minecraft-2/01.png',
+      '/slides/minecraft-2/02.png',
+      '/slides/minecraft-2/03.png',
+      '/slides/minecraft-2/04.png',
+      '/slides/minecraft-2/05.png',
+      '/slides/minecraft-2/06.png',
+      '/slides/minecraft-2/07.png',
+      '/slides/minecraft-2/08.png',
+      '/slides/minecraft-2/09.png',
+      '/slides/minecraft-2/10.png',
+      '/slides/minecraft-2/11.png',
+    ],
     cliente: {
       pdfUrl: '1wNt5Y5Vpa-no2iJ67qFApKnTGIPbBpU1',
       resumo: `🔘 🐍 Bem-vindos ao curso de "Minecraft Education Nível 2: Criando programas em Python dentro do jogo!"! 🖱️

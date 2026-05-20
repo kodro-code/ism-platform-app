@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { COURSES, type Course } from '@/data/courses'
 
@@ -154,13 +154,158 @@ function ClienteTab({ course }: { course: Course }) {
 }
 
 // ── Tab: Conhece o Produto ────────────────────────────────────────────────────
-function ConheceProdutoTab({ course }: { course: Course }) {
-  if (!course.conheceProduto) return <ComingSoon tab="Conhece o Produto" />
+function SlideCarousel({ slides }: { slides: string[] }) {
+  const [slide, setSlide]           = useState(0)
+  const [opacity, setOpacity]       = useState(1)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const fadingRef    = useRef(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const n = slides.length
 
-  const embedUrl = `https://docs.google.com/presentation/d/${course.conheceProduto}/embed?start=false&loop=false&rm=minimal`
+  const goTo = (i: number) => {
+    if (i < 0 || i >= n || fadingRef.current) return
+    fadingRef.current = true
+    setOpacity(0)
+    setTimeout(() => { setSlide(i); setOpacity(1); fadingRef.current = false }, 160)
+  }
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  goTo(slide - 1)
+      if (e.key === 'ArrowRight') goTo(slide + 1)
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [slide])
+
+  useEffect(() => {
+    const h = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', h)
+    return () => document.removeEventListener('fullscreenchange', h)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) containerRef.current?.requestFullscreen()
+    else document.exitFullscreen()
+  }
+
+  const ArrowBtn = ({ dir }: { dir: 'prev' | 'next' }) => {
+    if (dir === 'prev' ? slide === 0 : slide === n - 1) return null
+    return (
+      <button onClick={() => goTo(dir === 'prev' ? slide - 1 : slide + 1)} style={{
+        position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+        [dir === 'prev' ? 'left' : 'right']: 14,
+        width: 46, height: 46, borderRadius: '50%',
+        background: 'rgba(8,11,16,0.7)', border: '1px solid rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(6px)', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff', fontSize: 24, lineHeight: 1, userSelect: 'none',
+      }}>
+        {dir === 'prev' ? '‹' : '›'}
+      </button>
+    )
+  }
 
   return (
     <div>
+      {/* preload adjacent */}
+      {slide > 0     && <img src={slides[slide - 1]} style={{ display: 'none' }} alt="" />}
+      {slide < n - 1 && <img src={slides[slide + 1]} style={{ display: 'none' }} alt="" />}
+
+      {/* fullscreen container */}
+      <div
+        ref={containerRef}
+        style={{
+          background: isFullscreen ? '#000' : 'transparent',
+          ...(isFullscreen ? {
+            display: 'flex', flexDirection: 'column',
+            width: '100vw', height: '100vh',
+          } : {}),
+        }}
+      >
+        {/* slide image area */}
+        <div style={{
+          position: 'relative', lineHeight: 0,
+          ...(isFullscreen
+            ? { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }
+            : { borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.45)' }),
+        }}>
+          <img
+            src={slides[slide]}
+            alt={`Slide ${slide + 1}`}
+            style={{
+              display: 'block', transition: 'opacity 0.16s ease', opacity,
+              ...(isFullscreen
+                ? { width: '100%', height: '100%', objectFit: 'contain' }
+                : { width: '100%' }),
+            }}
+          />
+          <ArrowBtn dir="prev" />
+          <ArrowBtn dir="next" />
+
+          {/* progress bar */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'rgba(0,0,0,0.3)' }}>
+            <div style={{ height: '100%', width: `${((slide + 1) / n) * 100}%`, background: 'var(--accent)', transition: 'width 0.2s ease' }} />
+          </div>
+
+          {/* counter + fullscreen button */}
+          <div style={{ position: 'absolute', bottom: 12, right: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{
+              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
+              background: 'rgba(0,0,0,0.5)', borderRadius: 99, padding: '3px 10px',
+              backdropFilter: 'blur(4px)', fontFamily: "'Inter',sans-serif",
+            }}>
+              {slide + 1} / {n}
+            </div>
+            <button onClick={toggleFullscreen} title={isFullscreen ? 'Sair da apresentação' : 'Modo apresentação'} style={{
+              width: 30, height: 30, borderRadius: 8,
+              background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(4px)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
+            }}>
+              {isFullscreen
+                ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 1H1v3M8 1h3v3M4 11H1V8M8 11h3V8"/></svg>
+                : <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M1 4V1h3M8 1h3v3M1 8v3h3M11 8v3H8"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        {/* thumbnail strip */}
+        {n > 1 && (
+          <div style={{ display: 'flex', gap: 6, marginTop: 10, overflowX: 'auto', paddingBottom: 2, width: '100%', justifyContent: isFullscreen ? 'center' : 'flex-start' }}>
+            {slides.map((src, i) => (
+              <button key={i} onClick={() => goTo(i)} style={{
+                flexShrink: 0, padding: 0, cursor: 'pointer', background: 'none',
+                border: `2px solid ${i === slide ? 'var(--accent)' : 'transparent'}`,
+                borderRadius: 6, overflow: 'hidden',
+                opacity: i === slide ? 1 : 0.4,
+                transition: 'opacity 0.15s, border-color 0.15s',
+              }}>
+                <img src={src} style={{ height: isFullscreen ? 44 : 50, display: 'block' }} alt={`Slide ${i + 1}`} />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {!isFullscreen && (
+        <div style={{ textAlign: 'center', fontSize: 11, color: 'rgba(232,237,245,0.25)', marginTop: 10, fontFamily: "'Inter',sans-serif" }}>
+          ← → para navegar · clique nas miniaturas · ⛶ para apresentação
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ConheceProdutoTab({ course }: { course: Course }) {
+  const slides = course.slides ?? []
+  const hasContent = course.video || slides.length > 0 || course.conheceProduto
+  if (!hasContent) return <ComingSoon tab="Conhece o Produto" />
+
+  return (
+    <div>
+      {/* internal note */}
       <div style={{
         display: 'flex', alignItems: 'flex-start', gap: 10,
         padding: '10px 14px', borderRadius: 8, marginBottom: 18,
@@ -172,24 +317,59 @@ function ConheceProdutoTab({ course }: { course: Course }) {
         </span>
       </div>
 
-      <div style={{
-        textAlign: 'center', fontSize: 13, color: 'rgba(232,237,245,0.5)',
-        marginBottom: 12, fontFamily: "'Inter',sans-serif", lineHeight: 1.6,
-        padding: '8px 14px', borderRadius: 8,
-        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        👆 Clique no <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado direito</strong> do slide para avançar &nbsp;·&nbsp; <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado esquerdo</strong> para voltar
-      </div>
+      {/* video */}
+      {course.video && (
+        <div style={{ marginBottom: slides.length > 0 ? 28 : 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10, fontFamily: "'Inter',sans-serif" }}>
+            🎬 Apresentação em vídeo
+          </div>
+          <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: '#000', lineHeight: 0 }}>
+            <iframe
+              src={`https://drive.google.com/file/d/${course.video}/preview`}
+              width="100%"
+              style={{ display: 'block', border: 'none', aspectRatio: '16/9' }}
+              allow="autoplay"
+              allowFullScreen
+            />
+            {/* block the "open in Drive" button (top-right corner) */}
+            <div style={{ position: 'absolute', top: 0, right: 0, width: 60, height: 50, zIndex: 10 }} />
+          </div>
+        </div>
+      )}
 
-      <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.3)' }}>
-        <iframe
-          src={embedUrl}
-          width="100%"
-          height="560"
-          style={{ display: 'block', border: 'none' }}
-          allowFullScreen
-        />
-      </div>
+      {/* carousel */}
+      {slides.length > 0 && (
+        <div>
+          {course.video && (
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10, fontFamily: "'Inter',sans-serif" }}>
+              🖼 Slides da apresentação
+            </div>
+          )}
+          <SlideCarousel slides={slides} />
+        </div>
+      )}
+
+      {/* legacy Slides embed fallback */}
+      {slides.length === 0 && !course.video && course.conheceProduto && (
+        <>
+          <div style={{
+            textAlign: 'center', fontSize: 13, color: 'rgba(232,237,245,0.5)',
+            marginBottom: 12, fontFamily: "'Inter',sans-serif", lineHeight: 1.6,
+            padding: '8px 14px', borderRadius: 8,
+            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+          }}>
+            👆 Clique no <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado direito</strong> do slide para avançar &nbsp;·&nbsp; <strong style={{ color: 'rgba(232,237,245,0.8)' }}>lado esquerdo</strong> para voltar
+          </div>
+          <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.3)' }}>
+            <iframe
+              src={`https://docs.google.com/presentation/d/${course.conheceProduto}/embed?start=false&loop=false&rm=minimal`}
+              width="100%" height="560"
+              style={{ display: 'block', border: 'none' }}
+              allowFullScreen
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }

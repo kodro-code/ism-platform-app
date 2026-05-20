@@ -94,7 +94,8 @@ function getAllManagers() {
     } else if (email && meta[email] !== undefined) {
       mgrMeta = meta[email];
     } else {
-      r += BLOCK; continue; // not in passwords or inactive → skip
+      // Not in passwords (inactive/terminated) — include for totals but mark inactive
+      mgrMeta = { photoUrl: '', displayName: name, inactive: true };
     }
 
     var dataRow     = vals[r + 1];
@@ -156,7 +157,8 @@ function getAllManagers() {
       email:    email,
       rowStart: r,
       payments: payments,
-      photoUrl: mgrMeta.photoUrl || ''
+      photoUrl: mgrMeta.photoUrl || '',
+      inactive: mgrMeta.inactive || false
     });
     r += BLOCK;
   }

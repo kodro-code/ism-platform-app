@@ -326,6 +326,48 @@ function VentasSection({ ventas, ventaHeaders, loadingV, deletingRow, SHOW_COLS,
   );
 }
 
+// ── client message box ────────────────────────────────────────────────────────
+const CLIENT_MSG = `Olá! 😊
+
+Obrigado por confiar na Kodland! 🎉
+
+Temos um presente especial para você: ganhe uma *aula grátis* deixando sua avaliação no Trustpilot!
+
+👉 https://br.trustpilot.com/review/kodland.org
+
+É simples: acesse o link, deixe sua opinião e envie o print para nós. Sua aula grátis será adicionada na hora! 🎁
+
+E tem mais! Se quiser acumular ainda mais aulas gratuitas, conheça nosso *Programa de Indicações*: por cada amigo ou familiar que você indicar e se matricular na Kodland, você ganha aulas grátis.
+
+É só nos avisar que criamos um link personalizado para você acompanhar suas indicações. 😉
+
+Qualquer dúvida, estamos aqui para ajudar!`;
+
+function ClientMessageBox() {
+  const [copied, setCopied] = useState(false);
+
+  function copyMsg() {
+    navigator.clipboard.writeText(CLIENT_MSG).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
+
+  return (
+    <div style={{ marginTop:32, width:'100%', maxWidth:480, textAlign:'left' }}>
+      <div style={{ fontSize:10, letterSpacing:'0.06em', textTransform:'uppercase', color:'rgba(232,237,245,0.35)', marginBottom:10, fontFamily:"'Inter', sans-serif" }}>
+        📋 Envie ao cliente
+      </div>
+      <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:12, padding:'14px 16px', fontSize:12, color:'rgba(232,237,245,0.7)', fontFamily:"'Inter', sans-serif", lineHeight:1.7, whiteSpace:'pre-wrap', wordBreak:'break-word' }}>
+        {CLIENT_MSG}
+      </div>
+      <button onClick={copyMsg} style={{ marginTop:10, width:'100%', padding:'10px 0', borderRadius:9, border: copied ? '1px solid rgba(0,255,178,0.5)' : '1px solid rgba(255,255,255,0.1)', background: copied ? 'rgba(0,255,178,0.1)' : 'rgba(255,255,255,0.05)', color: copied ? '#00FFB2' : 'rgba(232,237,245,0.6)', fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:"'Inter', sans-serif", letterSpacing:'0.04em', transition:'all 0.2s' }}>
+        {copied ? '✓ Mensagem copiada!' : 'Copiar mensagem'}
+      </button>
+    </div>
+  );
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 export default function Relatorio() {
   const { data: session }         = useSession();
@@ -399,23 +441,25 @@ export default function Relatorio() {
   // ── success ────────────────────────────────────────────────────────────────
   if (status === 'success') {
     return (
-      <div style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'calc(100vh - 73px)', overflow:'hidden' }}>
+      <div style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', minHeight:'calc(100vh - 73px)', overflowY:'auto', paddingTop:48, paddingBottom:48 }}>
         {particles.map(p => (
-          <div key={p.id} style={{ position:'absolute', bottom:'42%', left:`${p.x}%`, width:p.size, height:p.size, borderRadius:'50%', background:p.color, boxShadow:`0 0 ${p.size*2}px ${p.color}80`, animation:`floatUp ${p.duration}s ease-out ${p.delay}s both` }} />
+          <div key={p.id} style={{ position:'fixed', bottom:'42%', left:`${p.x}%`, width:p.size, height:p.size, borderRadius:'50%', background:p.color, boxShadow:`0 0 ${p.size*2}px ${p.color}80`, animation:`floatUp ${p.duration}s ease-out ${p.delay}s both`, pointerEvents:'none' }} />
         ))}
-        <div className="panel-scale" style={{ textAlign:'center', zIndex:1 }}>
-          <div style={{ width:80, height:80, borderRadius:'50%', background:'rgba(0,255,178,0.08)', border:'2px solid #00FFB2', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px', boxShadow:'0 0 50px rgba(0,255,178,0.22)' }}>
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00FFB2" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div className="panel-scale" style={{ textAlign:'center', zIndex:1, width:'100%', maxWidth:480, display:'flex', flexDirection:'column', alignItems:'center' }}>
+          <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(0,255,178,0.08)', border:'2px solid #00FFB2', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', boxShadow:'0 0 40px rgba(0,255,178,0.22)' }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00FFB2" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div style={{ fontSize:10, letterSpacing:'0.05em', textTransform:'uppercase', color:'#00FFB2', marginBottom:10, fontFamily:"'Inter', sans-serif" }}>◈ Relatório enviado</div>
-          <h2 style={{ fontSize:28, fontWeight:800, fontFamily:"'Inter', sans-serif", marginBottom:8 }}>Tudo certo!</h2>
-          <p style={{ fontSize:13, color:'rgba(232,237,245,0.4)', marginBottom:32 }}>Dados salvos e Telegram notificado.</p>
+          <div style={{ fontSize:10, letterSpacing:'0.05em', textTransform:'uppercase', color:'#00FFB2', marginBottom:8, fontFamily:"'Inter', sans-serif" }}>◈ Relatório enviado</div>
+          <h2 style={{ fontSize:24, fontWeight:800, fontFamily:"'Inter', sans-serif", marginBottom:6 }}>Tudo certo!</h2>
+          <p style={{ fontSize:13, color:'rgba(232,237,245,0.4)', marginBottom:20 }}>Dados salvos e Telegram notificado.</p>
           <button onClick={reset}
-            style={{ padding:'11px 36px', borderRadius:10, border:'1px solid rgba(0,255,178,0.3)', background:'rgba(0,255,178,0.08)', color:'#00FFB2', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:"'Inter', sans-serif", letterSpacing:'0.05em', transition:'all 0.2s' }}
+            style={{ padding:'10px 32px', borderRadius:10, border:'1px solid rgba(0,255,178,0.3)', background:'rgba(0,255,178,0.08)', color:'#00FFB2', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:"'Inter', sans-serif", letterSpacing:'0.05em', transition:'all 0.2s' }}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='rgba(0,255,178,0.16)'}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='rgba(0,255,178,0.08)'}}>
             Novo Relatório
           </button>
+
+          <ClientMessageBox />
         </div>
       </div>
     );

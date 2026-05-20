@@ -557,7 +557,8 @@
 
     // Card 3 — Prediction
     document.getElementById('lv-p-tot').innerText = fmtMoney(d.pipe.tot);
-    const diffAmt = d.pipe.tot - d.metrics.left;
+    const liveLeft = Math.max(0, tar - totalRev);
+    const diffAmt  = d.pipe.tot - liveLeft;
     const pDiff   = document.getElementById('lv-p-diff');
     pDiff.innerText   = (diffAmt >= 0 ? '+' : '') + fmtMoney(diffAmt);
     pDiff.style.color = diffAmt >= 0 ? 'var(--top)' : 'var(--out)';
@@ -565,7 +566,7 @@
     document.getElementById('lv-p-neg').innerText  = fmtMoney(d.pipe.neg);
     document.getElementById('lv-p-pay').innerText  = fmtMoney(d.pipe.pay);
 
-    const remVal      = d.metrics.left;
+    const remVal      = Math.max(0, tar - totalRev);  // live: recalculate from current revenue
     const coveragePct = remVal > 0 ? (d.pipe.tot / remVal) * 100 : 100;
     document.getElementById('lv-rem').innerText = fmtMoney(remVal);
     document.getElementById('lv-rem-p').innerText = coveragePct.toFixed(1) + '%';

@@ -52,10 +52,10 @@ const NAV: NavItem[] = [
   {
     id: 'direction', label: 'Direction', route: '/direction',
     children: [
-      { id: 'brasil',            label: 'LX Presentation',         icon: '📊', route: '/direction/brasil',      desc: 'Apresentação para a equipe LX' },
-      { id: 'dir-indicacoes',    label: 'Indicações',              icon: '🔗', route: '/direction/indicacoes',  desc: 'Painel de indicações de todos os managers' },
-      { id: 'perf-managers',     label: 'Performance per Manager', icon: '📈', route: '/minha-area',            desc: 'Relatório de performance de todos os managers' },
-      { id: 'salarios',          label: 'Salary Approval',         icon: '💳', route: '/direction/salarios',    desc: 'Aprovação de salários e histórico por manager' },
+      { id: 'brasil',            label: 'ISM Presentation',        icon: '📊', route: '/direction/brasil',      desc: 'ISM live dashboard and monthly presentation' },
+      { id: 'perf-managers',     label: 'Performance per Manager', icon: '📈', route: '/minha-area',            desc: 'Performance report for all managers' },
+      { id: 'salarios',          label: 'Salary Approval',         icon: '💳', route: '/direction/salarios',    desc: 'Salary approval and history per manager' },
+      { id: 'dir-indicacoes',    label: 'Referral History',        icon: '🔗', route: '/direction/indicacoes',  desc: 'Referral panel for all managers' },
     ],
   },
 ];

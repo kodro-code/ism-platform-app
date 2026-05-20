@@ -606,9 +606,9 @@
     document.getElementById('v-rr-p').innerText = rrP.toFixed(2) + '%';
     draw('rrChart', rrP, '#3b82f6');
 
-    document.getElementById('v-sales').innerText   = d.metrics.sales;
+    document.getElementById('v-sales').innerText   = Math.round(d.metrics.sales);
     document.getElementById('v-aov').innerText     = fmtMoney(d.metrics.aov);
-    document.getElementById('v-lessons').innerText = d.metrics.lessons;
+    document.getElementById('v-lessons').innerText = Math.round(d.metrics.lessons);
     document.getElementById('v-ppl').innerText     = fmtMoney(d.metrics.ppl);
 
     document.getElementById('p-tot').innerText = fmtMoney(d.pipe.tot);
@@ -651,7 +651,7 @@
         else dist.norm++;
         return `<tr class="mgr-row">
           <td style="padding:12px 15px; font-weight:500;">${m.name}</td>
-          <td style="text-align:center">${m.sales}</td>
+          <td style="text-align:center">${Math.round(m.sales)}</td>
           <td style="text-align:center">${fmtMoney(m.amount)}</td>
           <td style="text-align:center; font-weight:600; color:var(--accent)">${fmtMoney(m.amount / shouldFactor)}</td>
           <td style="text-align:center">${fmtMoney(m.aov)}</td>
